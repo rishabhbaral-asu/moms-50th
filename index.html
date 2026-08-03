@@ -5,12 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mom's 50th Birthday Dining Map</title>
   
-  <!-- Leaflet CSS for Map Styling -->
+  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Google Fonts: Inter for Clean Professional Typography -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --surface: #ffffff;
+      --bg-body: #f8fafc;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --success: #16a34a;
+      --warning: #d97706;
+      --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -23,219 +36,313 @@
       flex-direction: column;
       height: 100vh;
       overflow: hidden;
-      background-color: #f4f5f7;
+      background-color: var(--bg-body);
+      color: var(--text-main);
     }
 
     @media (min-width: 768px) {
       body { flex-direction: row; }
     }
 
-    /* Sidebar Styling */
+    /* Professional Sidebar Styling (Apple Maps / Modern Google Maps Floating Panel) */
     #sidebar {
       width: 100%;
-      height: 50vh;
-      background: #ffffff;
-      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+      height: 55vh;
+      background: var(--surface);
       display: flex;
       flex-direction: column;
       z-index: 1000;
+      border-right: 1px solid var(--border);
+      box-shadow: var(--shadow-lg);
     }
 
     @media (min-width: 768px) {
       #sidebar {
-        width: 450px;
+        width: 440px;
         height: 100%;
       }
     }
 
     .header {
-      padding: 16px 20px;
-      background: #111827;
+      padding: 20px 20px 16px 20px;
+      background: #0b0f19;
       color: white;
     }
 
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
     .header h1 {
-      font-size: 1.2rem;
-      font-weight: 700;
-      margin-bottom: 2px;
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
     }
 
-    .header p {
+    .header-sub {
       font-size: 0.775rem;
-      color: #9ca3af;
+      color: #94a3b8;
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
-    .badge-container {
+    .meta-badges {
       display: flex;
       gap: 6px;
-      margin-top: 8px;
-      flex-wrap: wrap;
+      margin-top: 12px;
     }
 
-    .badge {
-      background: #374151;
-      color: #e5e7eb;
-      font-size: 0.7rem;
-      padding: 3px 6px;
-      border-radius: 4px;
-      font-weight: 500;
+    .meta-badge {
+      background: rgba(255, 255, 255, 0.1);
+      color: #cbd5e1;
+      font-size: 0.675rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 9999px;
+      backdrop-filter: blur(4px);
     }
 
+    /* Filter Panel Styling */
+    .filter-panel {
+      padding: 14px 20px;
+      background: #f1f5f9;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .filter-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .filter-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .filter-label {
+      font-size: 0.675rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    select, input[type="range"] {
+      width: 100%;
+      padding: 7px 10px;
+      font-size: 0.775rem;
+      font-weight: 600;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-main);
+      outline: none;
+      cursor: pointer;
+    }
+
+    select:focus {
+      border-color: var(--primary);
+    }
+
+    .range-val {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    /* Location List */
     .location-list {
       flex: 1;
       overflow-y: auto;
-      padding: 14px;
+      padding: 16px;
+      background: var(--bg-body);
     }
 
     .card {
-      background: #ffffff;
-      border: 1px solid #e5e7eb;
-      border-radius: 10px;
-      padding: 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
       margin-bottom: 12px;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .card:hover, .card.active {
-      border-color: #2563eb;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
-      background: #f8fafc;
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+      border-color: #cbd5e1;
+    }
+
+    .card.active {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2), var(--shadow-lg);
+      background: #ffffff;
     }
 
     .card-header-row {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
 
     .card-title {
-      font-size: 0.975rem;
+      font-size: 1rem;
       font-weight: 700;
-      color: #1f2937;
+      color: var(--text-main);
+      line-height: 1.25;
     }
 
     .rating-badge {
       background: #fef3c7;
-      color: #b45309;
-      font-size: 0.725rem;
-      font-weight: 700;
-      padding: 2px 6px;
-      border-radius: 6px;
+      color: #92400e;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 9999px;
       white-space: nowrap;
     }
 
-    .distance-tag {
-      display: inline-block;
-      font-size: 0.725rem;
-      color: #15803d;
+    .tag-container {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .dist-tag {
+      font-size: 0.7rem;
+      color: #166534;
       background: #dcfce7;
       font-weight: 700;
-      padding: 2px 6px;
-      border-radius: 4px;
-      margin-bottom: 6px;
+      padding: 2px 7px;
+      border-radius: 6px;
     }
 
     .cuisine-tag {
-      font-size: 0.75rem;
-      color: #2563eb;
-      font-weight: 600;
-      margin-left: 6px;
+      font-size: 0.7rem;
+      color: var(--primary);
+      background: #eff6ff;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
       text-transform: uppercase;
     }
 
-    .card-detail {
-      font-size: 0.8rem;
-      color: #4b5563;
-      margin-bottom: 6px;
+    .buffet-tag {
+      font-size: 0.7rem;
+      color: #7c2d12;
+      background: #ffedd5;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
     }
 
-    .card-highlights {
+    .card-address {
+      font-size: 0.775rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .foodie-highlight {
       font-size: 0.775rem;
       color: #065f46;
-      background: #ecfdf5;
-      padding: 6px 8px;
-      border-radius: 6px;
-      margin-top: 6px;
+      background: #f0fdf4;
+      border-left: 3px solid #16a34a;
+      padding: 6px 10px;
+      border-radius: 0 6px 6px 0;
+      margin-bottom: 12px;
     }
 
-    /* Action Links Bar */
+    /* Clean Button Bar (Apple Maps Style) */
     .btn-group {
       display: flex;
-      gap: 6px;
-      margin-top: 10px;
+      gap: 8px;
     }
 
     .action-btn {
       flex: 1;
       text-align: center;
-      padding: 6px 4px;
-      font-size: 0.725rem;
-      font-weight: 600;
-      border-radius: 6px;
+      padding: 8px 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 8px;
       text-decoration: none;
-      transition: background 0.2s;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
     }
 
     .btn-nav {
-      background: #16a34a;
+      background: var(--primary);
       color: white;
     }
 
     .btn-nav:hover {
-      background: #15803d;
+      background: var(--primary-dark);
     }
 
-    .btn-menu {
-      background: #eff6ff;
-      color: #1d4ed8;
-      border: 1px solid #bfdbfe;
+    .btn-secondary {
+      background: #f1f5f9;
+      color: var(--text-main);
+      border: 1px solid var(--border);
     }
 
-    .btn-reviews {
-      background: #fffbeb;
-      color: #b45309;
-      border: 1px solid #fde68a;
+    .btn-secondary:hover {
+      background: #e2e8f0;
     }
 
-    /* Map Styling */
+    /* Map Display */
     #map {
       flex: 1;
-      height: 50vh;
+      height: 45vh;
     }
 
     @media (min-width: 768px) {
       #map { height: 100%; }
     }
 
-    .custom-marker {
-      background-color: #2563eb;
+    /* Custom Apple-Style Pins */
+    .custom-pin {
+      background-color: var(--primary);
       color: white;
       border-radius: 50%;
-      width: 28px;
-      height: 28px;
+      width: 30px;
+      height: 30px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 0.8rem;
-      font-weight: bold;
+      font-weight: 800;
       border: 2px solid white;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
 
-    .start-marker {
-      background-color: #dc2626;
+    .home-pin {
+      background-color: #ef4444;
       color: white;
       border-radius: 50%;
-      width: 32px;
-      height: 32px;
+      width: 34px;
+      height: 34px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: bold;
-      border: 2px solid white;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      font-size: 1.1rem;
+      border: 2.5px solid white;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
     }
   </style>
 </head>
@@ -244,12 +351,56 @@
   <!-- Sidebar UI -->
   <div id="sidebar">
     <div class="header">
-      <h1>Mom's 50th Birthday Dining Map</h1>
-      <p>Measured from 3255 S Dorsey Ln, Tempe, AZ</p>
-      <div class="badge-container">
-        <span class="badge">🚫 No Beef / No Pork</span>
-        <span class="badge">📍 Multi-Location Covered</span>
-        <span class="badge">🚗 GPS Route Ready</span>
+      <div class="header-top">
+        <h1>Mom's 50th Birthday</h1>
+      </div>
+      <div class="header-sub">
+        <span>📍 Origin: 3255 S Dorsey Ln, Tempe</span>
+      </div>
+      <div class="meta-badges">
+        <span class="meta-badge">🚫 No Beef / Pork</span>
+        <span class="meta-badge">❄️ Indoor A/C</span>
+        <span class="meta-badge">👨‍👩‍👧‍👦 Family Friendly</span>
+      </div>
+    </div>
+
+    <!-- Filter Bar (Cuisine, Style, Radius, Price) -->
+    <div class="filter-panel">
+      <div class="filter-row">
+        <div class="filter-group">
+          <label class="filter-label">Style</label>
+          <select id="filter-style" onchange="applyFilters()">
+            <option value="all">All Styles</option>
+            <option value="buffet">Buffet / AYCE Only</option>
+            <option value="sitdown">Sit-Down / Family Style</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Cuisine</label>
+          <select id="filter-cuisine" onchange="applyFilters()">
+            <option value="all">All Cuisines</option>
+            <option value="Indian">Indian</option>
+            <option value="Japanese">Japanese</option>
+            <option value="Thai">Thai</option>
+            <option value="Mexican">Mexican / Fusion</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="filter-row" style="align-items: center; margin-top: 2px;">
+        <div class="filter-group">
+          <label class="filter-label">Max Radius: <span id="radius-val" class="range-val">30 mi</span></label>
+          <input type="range" id="filter-radius" min="2" max="30" value="30" oninput="updateRadiusLabel(this.value)" onchange="applyFilters()">
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Max Price</label>
+          <select id="filter-price" onchange="applyFilters()">
+            <option value="all">Any Price</option>
+            <option value="$">$ (Under $20)</option>
+            <option value="$$">$$ ($20 - $35)</option>
+            <option value="$$$">$$$ ($35+)</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -263,21 +414,22 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <script>
-    // Starting Point Coordinates: 3255 S Dorsey Ln, Tempe, AZ 85282
     const startLat = 33.3920;
     const startLng = -111.9163;
     const originAddress = "3255+S+Dorsey+Ln,+Tempe,+AZ+85282";
 
-    // Complete Multi-Location Dataset with calculated distances from Tempe
+    // Full Dataset with Metadata Tags for Filtering
     const locations = [
       {
         id: 1,
         name: "Bombay House – Tempe",
-        cuisine: "Indian Buffet",
+        cuisine: "Indian",
+        isBuffet: true,
+        distMiles: 1.3,
+        driveTime: "~4 mins",
         lat: 33.3783,
         lng: -111.9094,
         address: "1801 E Baseline Rd #104, Tempe, AZ 85283",
-        distance: "1.3 mi (~4 mins)",
         rating: "4.6 ★",
         price: "$",
         dishes: "Butter chicken, Tandoori chicken drumsticks, Coconut fish curry, Garlic naan.",
@@ -288,11 +440,13 @@
       {
         id: 2,
         name: "Yama Sushi House – Chandler",
-        cuisine: "AYCE Japanese",
+        cuisine: "Japanese",
+        isBuffet: true,
+        distMiles: 7.3,
+        driveTime: "~11 mins",
         lat: 33.3201,
         lng: -111.8622,
         address: "1175 W Ray Rd #1, Chandler, AZ 85224",
-        distance: "7.3 mi (~11 mins)",
         rating: "4.7 ★",
         price: "$$",
         dishes: "Torch-seared nigiri, Salmon carpaccio, Chicken teriyaki, Tempura shrimp.",
@@ -303,11 +457,13 @@
       {
         id: 3,
         name: "Malee's Thai Bistro – Old Town",
-        cuisine: "Thai Family-Style",
+        cuisine: "Thai",
+        isBuffet: false,
+        distMiles: 8.8,
+        driveTime: "~15 mins",
         lat: 33.4932,
         lng: -111.9287,
         address: "7131 E Main St, Scottsdale, AZ 85251",
-        distance: "8.8 mi (~15 mins)",
         rating: "4.5 ★",
         price: "$$",
         dishes: "Siamese fish, Green curry chicken, Tom yum seafood soup, Giant shrimp pad thai.",
@@ -318,14 +474,16 @@
       {
         id: 4,
         name: "SumoMaya – Scottsdale",
-        cuisine: "Asian & Mexican Fusion",
+        cuisine: "Mexican",
+        isBuffet: false,
+        distMiles: 12.3,
+        driveTime: "~18 mins",
         lat: 33.5338,
         lng: -111.9261,
         address: "6560 E Scottsdale Rd, Scottsdale, AZ 85253",
-        distance: "12.3 mi (~18 mins)",
         rating: "4.6 ★",
         price: "$$$",
-        dishes: "Hamachi ceviche, Coconut shrimp, Wood-fired chicken, Pork-free sushi options.",
+        dishes: "Hamachi ceviche, Coconut shrimp, Wood-fired chicken, Asian-Mexican fusion.",
         menuUrl: "https://sumomaya.com/",
         googleMapUrl: "https://maps.google.com/?q=SumoMaya+Scottsdale",
         navUrl: `https://www.google.com/maps/dir/?api=1&origin=${originAddress}&destination=6560+E+Scottsdale+Rd,+Scottsdale,+AZ+85253`
@@ -333,11 +491,13 @@
       {
         id: 5,
         name: "Bombay House – Scottsdale",
-        cuisine: "Indian Buffet",
+        cuisine: "Indian",
+        isBuffet: true,
+        distMiles: 14.1,
+        driveTime: "~20 mins",
         lat: 33.5552,
         lng: -111.9095,
         address: "8140 N Hayden Rd, Scottsdale, AZ 85258",
-        distance: "14.1 mi (~20 mins)",
         rating: "4.6 ★",
         price: "$",
         dishes: "Butter chicken, Tandoori drumsticks, Shrimp curry, Fresh naan.",
@@ -348,11 +508,13 @@
       {
         id: 6,
         name: "Tandoori Times – Scottsdale",
-        cuisine: "Indian Bistro & Buffet",
+        cuisine: "Indian",
+        isBuffet: true,
+        distMiles: 14.1,
+        driveTime: "~20 mins",
         lat: 33.5552,
         lng: -111.9095,
         address: "8140 N Hayden Rd, Scottsdale, AZ 85258",
-        distance: "14.1 mi (~20 mins)",
         rating: "4.4 ★",
         price: "$$",
         dishes: "Tandoori chicken, Chicken tikka masala, Shrimp curry, Garlic naan.",
@@ -362,12 +524,14 @@
       },
       {
         id: 7,
-        name: "Yama Sushi House – Phoenix (Central)",
-        cuisine: "AYCE Japanese",
+        name: "Yama Sushi House – Central Phoenix",
+        cuisine: "Japanese",
+        isBuffet: true,
+        distMiles: 15.1,
+        driveTime: "~20 mins",
         lat: 33.5065,
         lng: -112.0738,
         address: "4750 N Central Ave #150, Phoenix, AZ 85012",
-        distance: "15.1 mi (~20 mins)",
         rating: "4.7 ★",
         price: "$$",
         dishes: "Fresh nigiri, Salmon carpaccio, Chicken teriyaki bento, Tempura shrimp.",
@@ -378,11 +542,13 @@
       {
         id: 8,
         name: "Yama Sushi House – Scottsdale",
-        cuisine: "AYCE Japanese",
+        cuisine: "Japanese",
+        isBuffet: true,
+        distMiles: 15.2,
+        driveTime: "~22 mins",
         lat: 33.5675,
         lng: -111.9168,
         address: "7704 E Doubletree Ranch Rd, Scottsdale, AZ 85258",
-        distance: "15.2 mi (~22 mins)",
         rating: "4.7 ★",
         price: "$$",
         dishes: "Specialty sushi rolls, Chicken gyoza, Teriyaki salmon, Tempura.",
@@ -393,11 +559,13 @@
       {
         id: 9,
         name: "The Mexicano – Phoenix/PV",
-        cuisine: "Elevated Mexican",
+        cuisine: "Mexican",
+        isBuffet: false,
+        distMiles: 18.4,
+        driveTime: "~25 mins",
         lat: 33.5990,
         lng: -111.9790,
         address: "4801 E Cactus Rd, Phoenix, AZ 85032",
-        distance: "18.4 mi (~25 mins)",
         rating: "4.6 ★",
         price: "$$",
         dishes: "Slow-braised achiote chicken, Grilled snapper tacos, Tableside guacamole.",
@@ -408,11 +576,13 @@
       {
         id: 10,
         name: "Kasai Japanese Steakhouse – Scottsdale",
-        cuisine: "Teppanyaki Show",
+        cuisine: "Japanese",
+        isBuffet: false,
+        distMiles: 19.4,
+        driveTime: "~25 mins",
         lat: 33.6169,
         lng: -111.9261,
         address: "14344 N Scottsdale Rd, Scottsdale, AZ 85254",
-        distance: "19.4 mi (~25 mins)",
         rating: "4.8 ★",
         price: "$$$",
         dishes: "Chilean sea bass, Garlic butter tiger shrimp, Teppan chicken.",
@@ -423,11 +593,13 @@
       {
         id: 11,
         name: "Yama Sushi House – Union Hills",
-        cuisine: "AYCE Japanese",
+        cuisine: "Japanese",
+        isBuffet: true,
+        distMiles: 25.1,
+        driveTime: "~30 mins",
         lat: 33.6552,
         lng: -112.0641,
         address: "718 E Union Hills Dr, Phoenix, AZ 85024",
-        distance: "25.1 mi (~30 mins)",
         rating: "4.7 ★",
         price: "$$",
         dishes: "Fresh nigiri, Spicy salmon rolls, Chicken fried rice, Tempura.",
@@ -438,11 +610,13 @@
       {
         id: 12,
         name: "Tandoori Times 2 – Glendale",
-        cuisine: "Indian Bistro",
+        cuisine: "Indian",
+        isBuffet: true,
+        distMiles: 28.6,
+        driveTime: "~35 mins",
         lat: 33.6393,
         lng: -112.1802,
         address: "5626 W Bell Rd, Glendale, AZ 85308",
-        distance: "28.6 mi (~35 mins)",
         rating: "4.4 ★",
         price: "$$",
         dishes: "Chicken 65, Chili prawns, Tandoori chicken, Fresh garlic naan.",
@@ -453,11 +627,13 @@
       {
         id: 13,
         name: "Kasai Japanese Steakhouse – Peoria",
-        cuisine: "Teppanyaki Show",
+        cuisine: "Japanese",
+        isBuffet: false,
+        distMiles: 29.1,
+        driveTime: "~35 mins",
         lat: 33.5528,
         lng: -112.2705,
         address: "9824 W Northern Ave, Peoria, AZ 85345",
-        distance: "29.1 mi (~35 mins)",
         rating: "4.8 ★",
         price: "$$$",
         dishes: "Teppan shrimp, Chilean sea bass, Coconut curry chicken.",
@@ -468,11 +644,13 @@
       {
         id: 14,
         name: "Yama Sushi House – Peoria",
-        cuisine: "AYCE Japanese",
+        cuisine: "Japanese",
+        isBuffet: true,
+        distMiles: 29.1,
+        driveTime: "~35 mins",
         lat: 33.5528,
         lng: -112.2705,
         address: "9788 W Northern Ave #1450, Peoria, AZ 85345",
-        distance: "29.1 mi (~35 mins)",
         rating: "4.7 ★",
         price: "$$",
         dishes: "Sushi combinations, Chicken teriyaki, Tempura shrimp.",
@@ -482,7 +660,7 @@
       }
     ];
 
-    // Initialize Leaflet Map centered over Phoenix Metro Area
+    // Initialize Map with Custom CartoDB Voyager Tiles (Google/Apple Maps look)
     const map = L.map('map').setView([33.4800, -111.9500], 10);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
@@ -490,79 +668,127 @@
       attribution: '&copy; OpenStreetMap &copy; CARTO'
     }).addTo(map);
 
-    // 1. Add Start Location Pin (3255 S Dorsey Ln, Tempe)
-    const startIcon = L.divIcon({
-      className: 'start-marker',
+    // Render Origin Home Marker
+    const homeIcon = L.divIcon({
+      className: 'home-pin',
       html: `<span>🏠</span>`,
-      iconSize: [32, 32],
-      iconAnchor: [16, 32]
+      iconSize: [34, 34],
+      iconAnchor: [17, 34]
     });
-    const startMarker = L.marker([startLat, startLng], { icon: startIcon }).addTo(map);
-    startMarker.bindPopup(`
-      <div style="font-family: sans-serif;">
-        <b>🏠 Starting Point</b><br>
-        3255 S Dorsey Lane, Tempe, AZ 85282
-      </div>
-    `);
+    L.marker([startLat, startLng], { icon: homeIcon }).addTo(map)
+      .bindPopup(`<b>🏠 Start Point: 3255 S Dorsey Ln</b>`);
 
-    const listContainer = document.getElementById('location-list');
+    let activeMarkers = [];
 
-    // 2. Add Restaurant Markers & Sidebar Cards
-    locations.forEach((loc, index) => {
-      const customIcon = L.divIcon({
-        className: 'custom-marker',
-        html: `<span>${index + 1}</span>`,
-        iconSize: [28, 28],
-        iconAnchor: [14, 28]
+    function updateRadiusLabel(val) {
+      document.getElementById('radius-val').innerText = `${val} mi`;
+    }
+
+    function applyFilters() {
+      const selectedStyle = document.getElementById('filter-style').value;
+      const selectedCuisine = document.getElementById('filter-cuisine').value;
+      const selectedRadius = parseFloat(document.getElementById('filter-radius').value);
+      const selectedPrice = document.getElementById('filter-price').value;
+
+      // Filter array
+      const filtered = locations.filter(loc => {
+        // Style Filter
+        if (selectedStyle === 'buffet' && !loc.isBuffet) return false;
+        if (selectedStyle === 'sitdown' && loc.isBuffet) return false;
+
+        // Cuisine Filter
+        if (selectedCuisine !== 'all' && loc.cuisine !== selectedCuisine) return false;
+
+        // Radius Filter
+        if (loc.distMiles > selectedRadius) return false;
+
+        // Price Filter
+        if (selectedPrice !== 'all' && loc.price !== selectedPrice) return false;
+
+        return true;
       });
 
-      const marker = L.marker([loc.lat, loc.lng], { icon: customIcon }).addTo(map);
+      renderListAndMap(filtered);
+    }
 
-      const popupContent = `
-        <div style="font-family: sans-serif; width: 220px;">
-          <h3 style="margin-bottom: 2px; color: #111827; font-size: 0.95rem;">${loc.name}</h3>
-          <p style="font-size: 0.75rem; color: #15803d; font-weight: bold; margin-bottom: 2px;">📍 ${loc.distance}</p>
-          <p style="font-size: 0.75rem; color: #b45309; font-weight: bold;">${loc.rating}</p>
-          <p style="font-size: 0.75rem; color: #065f46; margin: 4px 0;"><b>Highlights:</b> ${loc.dishes}</p>
-          <div style="margin-top: 8px; display: flex; gap: 4px;">
-            <a href="${loc.navUrl}" target="_blank" style="background: #16a34a; color: white; padding: 4px 8px; font-size: 0.7rem; border-radius: 4px; text-decoration: none; font-weight: bold;">🚗 Route</a>
-            <a href="${loc.menuUrl}" target="_blank" style="background: #eff6ff; color: #1d4ed8; padding: 4px 8px; font-size: 0.7rem; border-radius: 4px; text-decoration: none; font-weight: bold;">📖 Menu</a>
+    function renderListAndMap(dataset) {
+      // Clear existing map markers
+      activeMarkers.forEach(m => map.removeLayer(m));
+      activeMarkers = [];
+
+      const container = document.getElementById('location-list');
+      container.innerHTML = '';
+
+      if (dataset.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding: 40px 20px; color: #64748b;">
+          <b>No places match these filters.</b><br><span style="font-size:0.8rem;">Try expanding your max distance or price option.</span>
+        </div>`;
+        return;
+      }
+
+      dataset.forEach((loc, idx) => {
+        // Map Marker
+        const pinIcon = L.divIcon({
+          className: 'custom-pin',
+          html: `<span>${idx + 1}</span>`,
+          iconSize: [30, 30],
+          iconAnchor: [15, 30]
+        });
+
+        const marker = L.marker([loc.lat, loc.lng], { icon: pinIcon }).addTo(map);
+
+        const popupHTML = `
+          <div style="font-family: sans-serif; width: 220px;">
+            <h3 style="margin-bottom: 2px; color: #0f172a; font-size: 0.95rem;">${loc.name}</h3>
+            <p style="font-size: 0.75rem; color: #166534; font-weight: bold; margin-bottom: 2px;">🚘 ${loc.distMiles} mi (${loc.driveTime})</p>
+            <p style="font-size: 0.75rem; color: #b45309; font-weight: bold;">${loc.rating}</p>
+            <p style="font-size: 0.75rem; color: #065f46; margin: 4px 0;"><b>Highlights:</b> ${loc.dishes}</p>
+            <div style="margin-top: 8px; display: flex; gap: 4px;">
+              <a href="${loc.navUrl}" target="_blank" style="background: #2563eb; color: white; padding: 4px 8px; font-size: 0.7rem; border-radius: 4px; text-decoration: none; font-weight: bold;">🚗 Route</a>
+              <a href="${loc.menuUrl}" target="_blank" style="background: #f1f5f9; color: #0f172a; padding: 4px 8px; font-size: 0.7rem; border-radius: 4px; text-decoration: none; font-weight: bold;">📖 Menu</a>
+            </div>
           </div>
-        </div>
-      `;
-      marker.bindPopup(popupContent);
+        `;
+        marker.bindPopup(popupHTML);
+        activeMarkers.push(marker);
 
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.id = `card-${loc.id}`;
-      card.innerHTML = `
-        <div class="card-header-row">
-          <div class="card-title">${index + 1}. ${loc.name}</div>
-          <div class="rating-badge">${loc.rating}</div>
-        </div>
-        <div>
-          <span class="distance-tag">🚘 ${loc.distance}</span>
-          <span class="cuisine-tag">${loc.cuisine} • ${loc.price}</span>
-        </div>
-        <div class="card-detail" style="margin-top:4px;">📍 ${loc.address}</div>
-        <div class="card-highlights">🍗 <b>Non-Beef/Pork Stars:</b> ${loc.dishes}</div>
-        
-        <div class="btn-group">
-          <a href="${loc.navUrl}" target="_blank" class="action-btn btn-nav" onclick="event.stopPropagation();">🚗 Route from Home</a>
-          <a href="${loc.menuUrl}" target="_blank" class="action-btn btn-menu" onclick="event.stopPropagation();">📖 Menu</a>
-          <a href="${loc.googleMapUrl}" target="_blank" class="action-btn btn-reviews" onclick="event.stopPropagation();">⭐ Reviews</a>
-        </div>
-      `;
+        // Sidebar Card
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.id = `card-${loc.id}`;
+        card.innerHTML = `
+          <div class="card-header-row">
+            <div class="card-title">${idx + 1}. ${loc.name}</div>
+            <div class="rating-badge">${loc.rating}</div>
+          </div>
+          <div class="tag-container">
+            <span class="dist-tag">🚘 ${loc.distMiles} mi (${loc.driveTime})</span>
+            <span class="cuisine-tag">${loc.cuisine} • ${loc.price}</span>
+            ${loc.isBuffet ? '<span class="buffet-tag">🍱 AYCE / Buffet</span>' : ''}
+          </div>
+          <div class="card-address">📍 ${loc.address}</div>
+          <div class="foodie-highlight">🍗 <b>Non-Beef/Pork Stars:</b> ${loc.dishes}</div>
+          
+          <div class="btn-group">
+            <a href="${loc.navUrl}" target="_blank" class="action-btn btn-nav" onclick="event.stopPropagation();">🚗 Route from Home</a>
+            <a href="${loc.menuUrl}" target="_blank" class="action-btn btn-secondary" onclick="event.stopPropagation();">📖 Menu</a>
+            <a href="${loc.googleMapUrl}" target="_blank" class="action-btn btn-secondary" onclick="event.stopPropagation();">⭐ Reviews</a>
+          </div>
+        `;
 
-      card.addEventListener('click', () => {
-        map.flyTo([loc.lat, loc.lng], 13, { duration: 1.2 });
-        marker.openPopup();
-        document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
-        card.classList.add('active');
+        card.addEventListener('click', () => {
+          map.flyTo([loc.lat, loc.lng], 13, { duration: 1.2 });
+          marker.openPopup();
+          document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+          card.classList.add('active');
+        });
+
+        container.appendChild(card);
       });
+    }
 
-      listContainer.appendChild(card);
-    });
+    // Initial Render
+    applyFilters();
   </script>
 </body>
 </html>

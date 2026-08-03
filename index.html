@@ -43,7 +43,7 @@
 
     @media (min-width: 768px) {
       #sidebar {
-        width: 440px;
+        width: 450px;
         height: 100%;
       }
     }
@@ -61,7 +61,7 @@
     }
 
     .header p {
-      font-size: 0.8rem;
+      font-size: 0.775rem;
       color: #9ca3af;
     }
 
@@ -111,7 +111,7 @@
     }
 
     .card-title {
-      font-size: 1rem;
+      font-size: 0.975rem;
       font-weight: 700;
       color: #1f2937;
     }
@@ -119,19 +119,29 @@
     .rating-badge {
       background: #fef3c7;
       color: #b45309;
-      font-size: 0.75rem;
+      font-size: 0.725rem;
       font-weight: 700;
       padding: 2px 6px;
       border-radius: 6px;
       white-space: nowrap;
     }
 
-    .cuisine-tag {
+    .distance-tag {
       display: inline-block;
+      font-size: 0.725rem;
+      color: #15803d;
+      background: #dcfce7;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-bottom: 6px;
+    }
+
+    .cuisine-tag {
       font-size: 0.75rem;
       color: #2563eb;
       font-weight: 600;
-      margin-bottom: 6px;
+      margin-left: 6px;
       text-transform: uppercase;
     }
 
@@ -148,17 +158,6 @@
       padding: 6px 8px;
       border-radius: 6px;
       margin-top: 6px;
-    }
-
-    .review-quote {
-      font-size: 0.75rem;
-      font-style: italic;
-      color: #4b5563;
-      background: #f3f4f6;
-      border-left: 3px solid #9ca3af;
-      padding: 6px 8px;
-      margin-top: 6px;
-      border-radius: 0 4px 4px 0;
     }
 
     /* Action Links Bar */
@@ -214,14 +213,29 @@
       background-color: #2563eb;
       color: white;
       border-radius: 50%;
-      width: 30px;
-      height: 30px;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: bold;
+      border: 2px solid white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+
+    .start-marker {
+      background-color: #dc2626;
+      color: white;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: bold;
       border: 2px solid white;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
     }
   </style>
 </head>
@@ -231,10 +245,11 @@
   <div id="sidebar">
     <div class="header">
       <h1>Mom's 50th Birthday Dining Map</h1>
-      <p>Phoenix Metro • Indoor Heatwave Ready</p>
+      <p>Measured from 3255 S Dorsey Ln, Tempe, AZ</p>
       <div class="badge-container">
         <span class="badge">🚫 No Beef / No Pork</span>
-        <span class="badge">🚗 Live GPS Navigation</span>
+        <span class="badge">📍 Multi-Location Covered</span>
+        <span class="badge">🚗 GPS Route Ready</span>
       </div>
     </div>
 
@@ -248,110 +263,269 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <script>
+    // Starting Point Coordinates: 3255 S Dorsey Ln, Tempe, AZ 85282
+    const startLat = 33.3920;
+    const startLng = -111.9163;
+    const originAddress = "3255+S+Dorsey+Ln,+Tempe,+AZ+85282";
+
+    // Complete Multi-Location Dataset with calculated distances from Tempe
     const locations = [
       {
         id: 1,
-        name: "Yama Sushi House",
-        cuisine: "Japanese • AYCE Made to Order",
-        lat: 33.5675,
-        lng: -111.9168,
-        address: "7704 E Doubletree Ranch Rd, Scottsdale, AZ 85258",
-        rating: "4.7 ★ (1,200+ Reviews)",
-        price: "$$",
-        dishes: "Torch-seared nigiri, Salmon carpaccio, Chicken teriyaki, Tempura shrimp.",
-        reviewSnippet: "“Endless high-quality sushi made fresh. Great chicken hot items for non-sushi eaters!”",
-        menuUrl: "https://www.yamascottsdale.com/",
-        googleMapUrl: "https://maps.google.com/?q=Yama+Sushi+House+Scottsdale",
-        navUrl: "https://www.google.com/maps/dir/?api=1&destination=7704+E+Doubletree+Ranch+Rd,+Scottsdale,+AZ+85258"
+        name: "Bombay House – Tempe",
+        cuisine: "Indian Buffet",
+        lat: 33.3783,
+        lng: -111.9094,
+        address: "1801 E Baseline Rd #104, Tempe, AZ 85283",
+        distance: "1.3 mi (~4 mins)",
+        rating: "4.6 ★",
+        price: "$",
+        dishes: "Butter chicken, Tandoori chicken drumsticks, Coconut fish curry, Garlic naan.",
+        menuUrl: "https://bombayhousetempe.com/",
+        googleMapUrl: "https://maps.google.com/?q=Bombay+House+Tempe",
+        navUrl: `https://www.google.com/maps/dir/?api=1&origin=${originAddress}&destination=1801+E+Baseline+Rd+%23104,+Tempe,+AZ+85283`
       },
       {
         id: 2,
-        name: "Bombay House",
-        cuisine: "Authentic Indian • Lunch & Dinner Buffet",
-        lat: 33.5602,
-        lng: -111.9095,
-        address: "8140 N Hayden Rd, Scottsdale, AZ 85258",
-        rating: "4.6 ★ (850+ Reviews)",
-        price: "$",
-        dishes: "Butter chicken, Tandoori chicken drumsticks, Coconut fish curry, Garlic naan.",
-        reviewSnippet: "“Authentic curry and clay-oven chicken. Zero pork/beef clutter, extremely family friendly.”",
-        menuUrl: "https://www.google.com/search?q=Bombay+House+Scottsdale+menu",
-        googleMapUrl: "https://maps.google.com/?q=Bombay+House+Scottsdale",
-        navUrl: "https://www.google.com/maps/dir/?api=1&destination=8140+N+Hayden+Rd,+Scottsdale,+AZ+85258"
+        name: "Yama Sushi House – Chandler",
+        cuisine: "AYCE Japanese",
+        lat: 33.3201,
+        lng: -111.8622,
+        address: "1175 W Ray Rd #1, Chandler, AZ 85224",
+        distance: "7.3 mi (~11 mins)",
+        rating: "4.7 ★",
+        price: "$$",
+        dishes: "Torch-seared nigiri, Salmon carpaccio, Chicken teriyaki, Tempura shrimp.",
+        menuUrl: "https://www.yamasushihousechandler.com/",
+        googleMapUrl: "https://maps.google.com/?q=Yama+Sushi+House+Chandler",
+        navUrl: `https://www.google.com/maps/dir/?api=1&origin=${originAddress}&destination=1175+W+Ray+Rd+%231,+Chandler,+AZ+85224`
       },
       {
         id: 3,
-        name: "Kasai Japanese Steakhouse",
-        cuisine: "Teppanyaki & Asian Fusion",
-        lat: 33.6169,
-        lng: -111.9261,
-        address: "14344 N Scottsdale Rd, Scottsdale, AZ 85254",
-        rating: "4.8 ★ (1,500+ Reviews)",
-        price: "$$$",
-        dishes: "Chilean sea bass, Garlic butter jumbo tiger shrimp, Coconut curry chicken.",
-        reviewSnippet: "“Interactive chef show that kept kids entertained, incredible sea bass, and flawless service.”",
-        menuUrl: "https://kasaiteppan.com/",
-        googleMapUrl: "https://maps.google.com/?q=Kasai+Japanese+Steakhouse+Scottsdale",
-        navUrl: "https://www.google.com/maps/dir/?api=1&destination=14344+N+Scottsdale+Rd,+Scottsdale,+AZ+85254"
-      },
-      {
-        id: 4,
-        name: "Malee's Thai Bistro",
-        cuisine: "Modern Family-Style Thai",
+        name: "Malee's Thai Bistro – Old Town",
+        cuisine: "Thai Family-Style",
         lat: 33.4932,
         lng: -111.9287,
         address: "7131 E Main St, Scottsdale, AZ 85251",
-        rating: "4.5 ★ (900+ Reviews)",
+        distance: "8.8 mi (~15 mins)",
+        rating: "4.5 ★",
         price: "$$",
         dishes: "Siamese fish, Green curry chicken, Tom yum seafood soup, Giant shrimp pad thai.",
-        reviewSnippet: "“Upscale indoor vibe in Old Town. They gladly customize dishes to be chicken or seafood only!”",
         menuUrl: "https://www.maleesonmain.com/",
         googleMapUrl: "https://maps.google.com/?q=Malees+Thai+Bistro+Scottsdale",
-        navUrl: "https://www.google.com/maps/dir/?api=1&destination=7131+E+Main+St,+Scottsdale,+AZ+85251"
+        navUrl: `https://www.google.com/maps/dir/?api=1&origin=${originAddress}&destination=7131+E+Main+St,+Scottsdale,+AZ+85251`
+      },
+      {
+        id: 4,
+        name: "SumoMaya – Scottsdale",
+        cuisine: "Asian & Mexican Fusion",
+        lat: 33.5338,
+        lng: -111.9261,
+        address: "6560 E Scottsdale Rd, Scottsdale, AZ 85253",
+        distance: "12.3 mi (~18 mins)",
+        rating: "4.6 ★",
+        price: "$$$",
+        dishes: "Hamachi ceviche, Coconut shrimp, Wood-fired chicken, Pork-free sushi options.",
+        menuUrl: "https://sumomaya.com/",
+        googleMapUrl: "https://maps.google.com/?q=SumoMaya+Scottsdale",
+        navUrl: `https://www.google.com/maps/dir/?api=1&origin=${originAddress}&destination=6560+E+Scottsdale+Rd,+Scottsdale,+AZ+85253`
       },
       {
         id: 5,
-        name: "Tandoori Times",
-        cuisine: "Indian Buffet & Bistro",
-        lat: 33.3932,
-        lng: -111.7891,
-        address: "815 N Dobson Rd, Mesa, AZ 85201",
-        rating: "4.4 ★ (600+ Reviews)",
+        name: "Bombay House – Scottsdale",
+        cuisine: "Indian Buffet",
+        lat: 33.5552,
+        lng: -111.9095,
+        address: "8140 N Hayden Rd, Scottsdale, AZ 85258",
+        distance: "14.1 mi (~20 mins)",
+        rating: "4.6 ★",
+        price: "$",
+        dishes: "Butter chicken, Tandoori drumsticks, Shrimp curry, Fresh naan.",
+        menuUrl: "https://bombayhousetempe.com/",
+        googleMapUrl: "https://maps.google.com/?q=Bombay+House+Scottsdale",
+        navUrl: `https://www.google.com/maps/dir/?api=1&origin=${originAddress}&destination=8140+N+Hayden+Rd,+Scottsdale,+AZ+85258`
+      },
+      {
+        id: 6,
+        name: "Tandoori Times – Scottsdale",
+        cuisine: "Indian Bistro & Buffet",
+        lat: 33.5552,
+        lng: -111.9095,
+        address: "8140 N Hayden Rd, Scottsdale, AZ 85258",
+        distance: "14.1 mi (~20 mins)",
+        rating: "4.4 ★",
         price: "$$",
-        dishes: "Tandoori chicken, Chicken tikka masala, Shrimp curry, Samosas.",
-        reviewSnippet: "“Full Indian buffet with tons of chicken and veggie choices. Very cool indoor rock decor.”",
-        menuUrl: "https://www.google.com/search?q=Tandoori+Times+Mesa+menu",
-        googleMapUrl: "https://maps.google.com/?q=Tandoori+Times+Mesa",
-        navUrl: "https://www.google.com/maps/dir/?api=1&destination=815+N+Dobson+Rd,+Mesa,+AZ+85201"
+        dishes: "Tandoori chicken, Chicken tikka masala, Shrimp curry, Garlic naan.",
+        menuUrl: "https://www.toasttab.com/local/tandoori-times-indian-bistro",
+        googleMapUrl: "https://maps.google.com/?q=Tandoori+Times+Scottsdale",
+        navUrl: `https://www.google.com/maps/dir/?api=1&origin=${originAddress}&destination=8140+N+Hayden+Rd,+Scottsdale,+AZ+85258`
+      },
+      {
+        id: 7,
+        name: "Yama Sushi House – Phoenix (Central)",
+        cuisine: "AYCE Japanese",
+        lat: 33.5065,
+        lng: -112.0738,
+        address: "4750 N Central Ave #150, Phoenix, AZ 85012",
+        distance: "15.1 mi (~20 mins)",
+        rating: "4.7 ★",
+        price: "$$",
+        dishes: "Fresh nigiri, Salmon carpaccio, Chicken teriyaki bento, Tempura shrimp.",
+        menuUrl: "https://www.yamasushiphoenix.com/",
+        googleMapUrl: "https://maps.google.com/?q=Yama+Sushi+House+Central+Phoenix",
+        navUrl: `https://www.google.com/maps/dir/?api=1&origin=${originAddress}&destination=4750+N+Central+Ave+%23150,+Phoenix,+AZ+85012`
+      },
+      {
+        id: 8,
+        name: "Yama Sushi House – Scottsdale",
+        cuisine: "AYCE Japanese",
+        lat: 33.5675,
+        lng: -111.9168,
+        address: "7704 E Doubletree Ranch Rd, Scottsdale, AZ 85258",
+        distance: "15.2 mi (~22 mins)",
+        rating: "4.7 ★",
+        price: "$$",
+        dishes: "Specialty sushi rolls, Chicken gyoza, Teriyaki salmon, Tempura.",
+        menuUrl: "https://www.yamascottsdale.com/",
+        googleMapUrl: "https://maps.google.com/?q=Yama+Sushi+House+Scottsdale",
+        navUrl: `https://www.google.com/maps/dir/?api=1&origin=${originAddress}&destination=7704+E+Doubletree+Ranch+Rd,+Scottsdale,+AZ+85258`
+      },
+      {
+        id: 9,
+        name: "The Mexicano – Phoenix/PV",
+        cuisine: "Elevated Mexican",
+        lat: 33.5990,
+        lng: -111.9790,
+        address: "4801 E Cactus Rd, Phoenix, AZ 85032",
+        distance: "18.4 mi (~25 mins)",
+        rating: "4.6 ★",
+        price: "$$",
+        dishes: "Slow-braised achiote chicken, Grilled snapper tacos, Tableside guacamole.",
+        menuUrl: "https://www.themexicano.com/",
+        googleMapUrl: "https://maps.google.com/?q=The+Mexicano+Phoenix",
+        navUrl: `https://www.google.com/maps/dir/?api=1&origin=${originAddress}&destination=4801+E+Cactus+Rd,+Phoenix,+AZ+85032`
+      },
+      {
+        id: 10,
+        name: "Kasai Japanese Steakhouse – Scottsdale",
+        cuisine: "Teppanyaki Show",
+        lat: 33.6169,
+        lng: -111.9261,
+        address: "14344 N Scottsdale Rd, Scottsdale, AZ 85254",
+        distance: "19.4 mi (~25 mins)",
+        rating: "4.8 ★",
+        price: "$$$",
+        dishes: "Chilean sea bass, Garlic butter tiger shrimp, Teppan chicken.",
+        menuUrl: "https://kasaiteppan.com/",
+        googleMapUrl: "https://maps.google.com/?q=Kasai+Japanese+Steakhouse+Scottsdale",
+        navUrl: `https://www.google.com/maps/dir/?api=1&origin=${originAddress}&destination=14344+N+Scottsdale+Rd,+Scottsdale,+AZ+85254`
+      },
+      {
+        id: 11,
+        name: "Yama Sushi House – Union Hills",
+        cuisine: "AYCE Japanese",
+        lat: 33.6552,
+        lng: -112.0641,
+        address: "718 E Union Hills Dr, Phoenix, AZ 85024",
+        distance: "25.1 mi (~30 mins)",
+        rating: "4.7 ★",
+        price: "$$",
+        dishes: "Fresh nigiri, Spicy salmon rolls, Chicken fried rice, Tempura.",
+        menuUrl: "https://www.yamaunionhills.com/",
+        googleMapUrl: "https://maps.google.com/?q=Yama+Sushi+House+Union+Hills",
+        navUrl: `https://www.google.com/maps/dir/?api=1&origin=${originAddress}&destination=718+E+Union+Hills+Dr,+Phoenix,+AZ+85024`
+      },
+      {
+        id: 12,
+        name: "Tandoori Times 2 – Glendale",
+        cuisine: "Indian Bistro",
+        lat: 33.6393,
+        lng: -112.1802,
+        address: "5626 W Bell Rd, Glendale, AZ 85308",
+        distance: "28.6 mi (~35 mins)",
+        rating: "4.4 ★",
+        price: "$$",
+        dishes: "Chicken 65, Chili prawns, Tandoori chicken, Fresh garlic naan.",
+        menuUrl: "https://www.google.com/search?q=Tandoori+Times+Glendale+menu",
+        googleMapUrl: "https://maps.google.com/?q=Tandoori+Times+Glendale",
+        navUrl: `https://www.google.com/maps/dir/?api=1&origin=${originAddress}&destination=5626+W+Bell+Rd,+Glendale,+AZ+85308`
+      },
+      {
+        id: 13,
+        name: "Kasai Japanese Steakhouse – Peoria",
+        cuisine: "Teppanyaki Show",
+        lat: 33.5528,
+        lng: -112.2705,
+        address: "9824 W Northern Ave, Peoria, AZ 85345",
+        distance: "29.1 mi (~35 mins)",
+        rating: "4.8 ★",
+        price: "$$$",
+        dishes: "Teppan shrimp, Chilean sea bass, Coconut curry chicken.",
+        menuUrl: "https://kasaiteppan.com/",
+        googleMapUrl: "https://maps.google.com/?q=Kasai+Japanese+Steakhouse+Peoria",
+        navUrl: `https://www.google.com/maps/dir/?api=1&origin=${originAddress}&destination=9824+W+Northern+Ave,+Peoria,+AZ+85345`
+      },
+      {
+        id: 14,
+        name: "Yama Sushi House – Peoria",
+        cuisine: "AYCE Japanese",
+        lat: 33.5528,
+        lng: -112.2705,
+        address: "9788 W Northern Ave #1450, Peoria, AZ 85345",
+        distance: "29.1 mi (~35 mins)",
+        rating: "4.7 ★",
+        price: "$$",
+        dishes: "Sushi combinations, Chicken teriyaki, Tempura shrimp.",
+        menuUrl: "https://yamasushihouse.com/",
+        googleMapUrl: "https://maps.google.com/?q=Yama+Sushi+House+Peoria",
+        navUrl: `https://www.google.com/maps/dir/?api=1&origin=${originAddress}&destination=9788+W+Northern+Ave+%231450,+Peoria,+AZ+85345`
       }
     ];
 
-    const map = L.map('map').setView([33.5200, -111.9100], 11);
+    // Initialize Leaflet Map centered over Phoenix Metro Area
+    const map = L.map('map').setView([33.4800, -111.9500], 10);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
       attribution: '&copy; OpenStreetMap &copy; CARTO'
     }).addTo(map);
 
+    // 1. Add Start Location Pin (3255 S Dorsey Ln, Tempe)
+    const startIcon = L.divIcon({
+      className: 'start-marker',
+      html: `<span>🏠</span>`,
+      iconSize: [32, 32],
+      iconAnchor: [16, 32]
+    });
+    const startMarker = L.marker([startLat, startLng], { icon: startIcon }).addTo(map);
+    startMarker.bindPopup(`
+      <div style="font-family: sans-serif;">
+        <b>🏠 Starting Point</b><br>
+        3255 S Dorsey Lane, Tempe, AZ 85282
+      </div>
+    `);
+
     const listContainer = document.getElementById('location-list');
 
+    // 2. Add Restaurant Markers & Sidebar Cards
     locations.forEach((loc, index) => {
       const customIcon = L.divIcon({
         className: 'custom-marker',
         html: `<span>${index + 1}</span>`,
-        iconSize: [30, 30],
-        iconAnchor: [15, 30]
+        iconSize: [28, 28],
+        iconAnchor: [14, 28]
       });
 
       const marker = L.marker([loc.lat, loc.lng], { icon: customIcon }).addTo(map);
 
       const popupContent = `
-        <div style="font-family: sans-serif; width: 210px;">
+        <div style="font-family: sans-serif; width: 220px;">
           <h3 style="margin-bottom: 2px; color: #111827; font-size: 0.95rem;">${loc.name}</h3>
+          <p style="font-size: 0.75rem; color: #15803d; font-weight: bold; margin-bottom: 2px;">📍 ${loc.distance}</p>
           <p style="font-size: 0.75rem; color: #b45309; font-weight: bold;">${loc.rating}</p>
           <p style="font-size: 0.75rem; color: #065f46; margin: 4px 0;"><b>Highlights:</b> ${loc.dishes}</p>
           <div style="margin-top: 8px; display: flex; gap: 4px;">
-            <a href="${loc.navUrl}" target="_blank" style="background: #16a34a; color: white; padding: 4px 8px; font-size: 0.7rem; border-radius: 4px; text-decoration: none; font-weight: bold;">🚗 Directions</a>
+            <a href="${loc.navUrl}" target="_blank" style="background: #16a34a; color: white; padding: 4px 8px; font-size: 0.7rem; border-radius: 4px; text-decoration: none; font-weight: bold;">🚗 Route</a>
             <a href="${loc.menuUrl}" target="_blank" style="background: #eff6ff; color: #1d4ed8; padding: 4px 8px; font-size: 0.7rem; border-radius: 4px; text-decoration: none; font-weight: bold;">📖 Menu</a>
           </div>
         </div>
@@ -366,20 +540,22 @@
           <div class="card-title">${index + 1}. ${loc.name}</div>
           <div class="rating-badge">${loc.rating}</div>
         </div>
-        <div class="cuisine-tag">${loc.cuisine} • ${loc.price}</div>
-        <div class="card-detail">📍 ${loc.address}</div>
+        <div>
+          <span class="distance-tag">🚘 ${loc.distance}</span>
+          <span class="cuisine-tag">${loc.cuisine} • ${loc.price}</span>
+        </div>
+        <div class="card-detail" style="margin-top:4px;">📍 ${loc.address}</div>
         <div class="card-highlights">🍗 <b>Non-Beef/Pork Stars:</b> ${loc.dishes}</div>
-        <div class="review-quote">${loc.reviewSnippet}</div>
         
         <div class="btn-group">
-          <a href="${loc.navUrl}" target="_blank" class="action-btn btn-nav" onclick="event.stopPropagation();">🚗 Directions</a>
+          <a href="${loc.navUrl}" target="_blank" class="action-btn btn-nav" onclick="event.stopPropagation();">🚗 Route from Home</a>
           <a href="${loc.menuUrl}" target="_blank" class="action-btn btn-menu" onclick="event.stopPropagation();">📖 Menu</a>
           <a href="${loc.googleMapUrl}" target="_blank" class="action-btn btn-reviews" onclick="event.stopPropagation();">⭐ Reviews</a>
         </div>
       `;
 
       card.addEventListener('click', () => {
-        map.flyTo([loc.lat, loc.lng], 14, { duration: 1.2 });
+        map.flyTo([loc.lat, loc.lng], 13, { duration: 1.2 });
         marker.openPopup();
         document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
         card.classList.add('active');

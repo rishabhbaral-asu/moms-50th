@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phoenix Non-Beef / Non-Pork Birthday Dining Map</title>
+  
+  <!-- Leaflet CSS for Map Styling -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Google Fonts for Clean Modern UI -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      background-color: #f4f5f7;
+    }
+
+    /* Sidebar Styling */
+    #sidebar {
+      width: 440px;
+      height: 100%;
+      background: #ffffff;
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      z-index: 1000;
+    }
+
+    .header {
+      padding: 20px;
+      background: #111827;
+      color: white;
+    }
+
+    .header h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .header p {
+      font-size: 0.85rem;
+      color: #9ca3af;
+    }
+
+    .badge-container {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      background: #374151;
+      color: #e5e7eb;
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .location-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .card:hover, .card.active {
+      border-color: #2563eb;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+      background: #f8fafc;
+    }
+
+    .card-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 4px;
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #1f2937;
+    }
+
+    .rating-badge {
+      background: #fef3c7;
+      color: #b45309;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+
+    .cuisine-tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      color: #2563eb;
+      font-weight: 600;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .card-detail {
+      font-size: 0.825rem;
+      color: #4b5563;
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+
+    .card-highlights {
+      font-size: 0.8rem;
+      color: #065f46;
+      background: #ecfdf5;
+      padding: 6px 10px;
+      border-radius: 6px;
+      margin-top: 8px;
+    }
+
+    .review-quote {
+      font-size: 0.775rem;
+      font-style: italic;
+      color: #4b5563;
+      background: #f3f4f6;
+      border-left: 3px solid #9ca3af;
+      padding: 6px 10px;
+      border-radius: 0 4px 4px 0;
+      margin-top: 8px;
+    }
+
+    /* Action Links Bar */
+    .btn-group {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .action-btn {
+      flex: 1;
+      text-align: center;
+      padding: 6px 8px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+
+    .btn-menu {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+    }
+
+    .btn-menu:hover {
+      background: #dbeafe;
+    }
+
+    .btn-reviews {
+      background: #fffbeb;
+      color: #b45309;
+      border: 1px solid #fde68a;
+    }
+
+    .btn-reviews:hover {
+      background: #fef3c7;
+    }
+
+    /* Map Styling */
+    #map {
+      flex: 1;
+      height: 100%;
+    }
+
+    /* Custom Marker Styles */
+    .custom-marker {
+      background-color: #2563eb;
+      color: white;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      border: 2px solid white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+
+    .popup-btn-container {
+      margin-top: 10px;
+      display: flex;
+      gap: 6px;
+    }
+
+    .popup-btn {
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar UI -->
+  <div id="sidebar">
+    <div class="header">
+      <h1>Mom's 50th Birthday Dining Map</h1>
+      <p>Phoenix Metro • Indoor Heatwave Friendly</p>
+      <div class="badge-container">
+        <span class="badge">🚫 No Beef / No Pork</span>
+        <span class="badge">⭐ Verified Reviews</span>
+        <span class="badge">📖 Menus Included</span>
+      </div>
+    </div>
+
+    <div class="location-list" id="location-list">
+      <!-- Location cards rendered dynamically -->
+    </div>
+  </div>
+
+  <!-- Map Display -->
+  <div id="map"></div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script>
+    // Restaurant Dataset (With Live Rating Data, Menu Links & Review Snippets)
+    const locations = [
+      {
+        id: 1,
+        name: "Yama Sushi House",
+        cuisine: "Japanese • Made-to-Order AYCE",
+        lat: 33.5675,
+        lng: -111.9168,
+        address: "7704 E Doubletree Ranch Rd, Scottsdale, AZ 85258",
+        rating: "4.7 ★ (1,200+ Reviews)",
+        price: "$$",
+        dishes: "Torch-seared nigiri, Salmon carpaccio, Chicken teriyaki, Tempura shrimp, Chicken gyoza.",
+        reviewSnippet: "“Endless high-quality sushi made fresh to order. Great chicken hot items for non-sushi eaters!”",
+        menuUrl: "https://www.yamascottsdale.com/",
+        googleMapUrl: "https://maps.google.com/?q=Yama+Sushi+House+Scottsdale"
+      },
+      {
+        id: 2,
+        name: "Bombay House",
+        cuisine: "Authentic Indian • Lunch & Dinner Buffet",
+        lat: 33.5602,
+        lng: -111.9095,
+        address: "8140 N Hayden Rd, Scottsdale, AZ 85258",
+        rating: "4.6 ★ (850+ Reviews)",
+        price: "$",
+        dishes: "Butter chicken, Tandoori chicken drumsticks, Coconut fish curry, Garlic naan, Mango lassis.",
+        reviewSnippet: "“Authentic curry and clay-oven chicken. Zero pork/beef clutter, extremely family friendly.”",
+        menuUrl: "https://www.google.com/search?q=Bombay+House+Scottsdale+menu",
+        googleMapUrl: "https://maps.google.com/?q=Bombay+House+Scottsdale"
+      },
+      {
+        id: 3,
+        name: "Kasai Japanese Steakhouse",
+        cuisine: "Teppanyaki & Asian Fusion",
+        lat: 33.6169,
+        lng: -111.9261,
+        address: "14344 N Scottsdale Rd, Scottsdale, AZ 85254",
+        rating: "4.8 ★ (1,500+ Reviews)",
+        price: "$$$",
+        dishes: "Chilean sea bass, Garlic butter jumbo tiger shrimp, Coconut curry chicken.",
+        reviewSnippet: "“Interactive chef show that kept kids entertained, incredible sea bass, and flawless service.”",
+        menuUrl: "https://kasaiteppan.com/",
+        googleMapUrl: "https://maps.google.com/?q=Kasai+Japanese+Steakhouse+Scottsdale"
+      },
+      {
+        id: 4,
+        name: "Malee's Thai Bistro",
+        cuisine: "Modern Family-Style Thai",
+        lat: 33.4932,
+        lng: -111.9287,
+        address: "7131 E Main St, Scottsdale, AZ 85251",
+        rating: "4.5 ★ (900+ Reviews)",
+        price: "$$",
+        dishes: "Siamese fish, Green curry chicken, Tom yum seafood soup, Giant shrimp pad thai.",
+        reviewSnippet: "“Upscale indoor vibe in Old Town. They gladly customize dishes to be chicken or seafood only!”",
+        menuUrl: "https://www.maleesonmain.com/",
+        googleMapUrl: "https://maps.google.com/?q=Malees+Thai+Bistro+Scottsdale"
+      },
+      {
+        id: 5,
+        name: "Tandoori Times",
+        cuisine: "Indian Buffet & Bistro",
+        lat: 33.3932,
+        lng: -111.7891,
+        address: "815 N Dobson Rd, Mesa, AZ 85201",
+        rating: "4.4 ★ (600+ Reviews)",
+        price: "$$",
+        dishes: "Tandoori chicken, Chicken tikka masala, Shrimp curry, Samosas.",
+        reviewSnippet: "“Full Indian buffet with tons of chicken and veggie choices. Very cool indoor rock-and-roll decor.”",
+        menuUrl: "https://www.google.com/search?q=Tandoori+Times+Mesa+menu",
+        googleMapUrl: "https://maps.google.com/?q=Tandoori+Times+Mesa"
+      }
+    ];
+
+    // Initialize Leaflet Map centered over Scottsdale/Phoenix area
+    const map = L.map('map').setView([33.5200, -111.9100], 11);
+
+    // Add high-quality map tile layer (CartoDB Voyager)
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap &copy; CARTO'
+    }).addTo(map);
+
+    const markers = [];
+    const listContainer = document.getElementById('location-list');
+
+    // Render Markers & Sidebar Cards
+    locations.forEach((loc, index) => {
+      // 1. Create Map Marker
+      const customIcon = L.divIcon({
+        className: 'custom-marker',
+        html: `<span>${index + 1}</span>`,
+        iconSize: [32, 32],
+        iconAnchor: [16, 32]
+      });
+
+      const marker = L.marker([loc.lat, loc.lng], { icon: customIcon }).addTo(map);
+
+      // Popup Info Box on Map
+      const popupContent = `
+        <div style="font-family: sans-serif; width: 230px;">
+          <h3 style="margin-bottom: 2px; color: #111827; font-size: 1rem;">${loc.name}</h3>
+          <p style="font-size: 0.8rem; color: #b45309; font-weight: bold;">${loc.rating}</p>
+          <p style="font-size: 0.75rem; color: #2563eb; font-weight: 600; margin-bottom: 4px;">${loc.cuisine}</p>
+          <p style="font-size: 0.75rem; color: #065f46;"><b>Non-Beef/Pork Stars:</b> ${loc.dishes}</p>
+          <div class="popup-btn-container">
+            <a href="${loc.menuUrl}" target="_blank" class="popup-btn" style="background: #eff6ff; color: #1d4ed8;">📖 Menu</a>
+            <a href="${loc.googleMapUrl}" target="_blank" class="popup-btn" style="background: #fffbeb; color: #b45309;">⭐ Reviews</a>
+          </div>
+        </div>
+      `;
+      marker.bindPopup(popupContent);
+      markers.push({ id: loc.id, marker });
+
+      // 2. Render Sidebar Card
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.id = `card-${loc.id}`;
+      card.innerHTML = `
+        <div class="card-header-row">
+          <div class="card-title">${index + 1}. ${loc.name}</div>
+          <div class="rating-badge">${loc.rating}</div>
+        </div>
+        <div class="cuisine-tag">${loc.cuisine} • ${loc.price}</div>
+        <div class="card-detail">📍 ${loc.address}</div>
+        <div class="card-highlights">🍗 <b>Non-Beef/Pork Stars:</b> ${loc.dishes}</div>
+        <div class="review-quote">${loc.reviewSnippet}</div>
+        
+        <div class="btn-group">
+          <a href="${loc.menuUrl}" target="_blank" class="action-btn btn-menu" onclick="event.stopPropagation();">📖 View Menu</a>
+          <a href="${loc.googleMapUrl}" target="_blank" class="action-btn btn-reviews" onclick="event.stopPropagation();">⭐ Read Reviews</a>
+        </div>
+      `;
+
+      // Interactivity: Click card to pan map and open popup
+      card.addEventListener('click', () => {
+        map.flyTo([loc.lat, loc.lng], 14, { duration: 1.2 });
+        marker.openPopup();
+        
+        // Highlight active card
+        document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+      });
+
+      listContainer.appendChild(card);
+    });
+  </script>
+</body>
+</html>

@@ -3,148 +3,140 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mom's 50th Birthday Dining Map</title>
+  <title>Mom's 50th Birthday Restaurant Guide</title>
+
+  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <style>
-    :root {
-      --primary: #2563eb;
-      --primary-dark: #1d4ed8;
-      --surface: #ffffff;
-      --bg-body: #f8fafc;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-      --border: #e2e8f0;
-      --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f4f6f8; color: #333; }
+
+    /* Header */
+    header { background: #1a202c; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+    header h1 { font-size: 1.3rem; font-weight: 600; }
+    header p { font-size: 0.85rem; color: #a0aec0; }
+
+    /* Layout */
+    .app-container { display: flex; height: calc(100vh - 60px); overflow: hidden; }
+    
+    /* Sidebar */
+    .sidebar { width: 420px; background: white; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; z-index: 2; }
+    
+    /* Controls Area */
+    .controls-panel { padding: 16px; border-bottom: 1px solid #e2e8f0; background: #fafafa; display: flex; flex-direction: column; gap: 10px; }
+    .search-input { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 0.95rem; }
+    
+    .filter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    select, input[type="range"] { width: 100%; padding: 8px; border: 1px solid #cbd5e0; border-radius: 6px; background: white; font-size: 0.85rem; }
+    
+    .range-group { display: flex; flex-direction: column; gap: 4px; font-size: 0.8rem; color: #4a5568; }
+    .checkbox-label { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-top: 4px; }
+
+    /* List Area */
+    .cards-list { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    
+    /* Cards */
+    .card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; background: white; transition: all 0.2s ease; cursor: pointer; position: relative; }
+    .card:hover { border-color: #3182ce; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .card.active { border: 2px solid #3182ce; background: #ebf8ff; }
+    
+    .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+    .card-title { font-weight: 700; font-size: 1rem; color: #2d3748; }
+    .card-rating { background: #edf2f7; padding: 2px 6px; border-radius: 4px; font-weight: 600; font-size: 0.8rem; }
+    
+    .card-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .badge { background: #e2e8f0; color: #4a5568; font-size: 0.75rem; padding: 2px 8px; border-radius: 12px; }
+    .badge.buffet { background: #feebc8; color: #742a2a; font-weight: 600; }
+    
+    .card-info { font-size: 0.85rem; color: #4a5568; margin-bottom: 8px; }
+    .card-info b { color: #2b6cb0; }
+    
+    .card-actions { display: flex; gap: 8px; margin-top: 8px; }
+    .btn { text-decoration: none; padding: 6px 12px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; text-align: center; flex: 1; }
+    .btn-primary { background: #3182ce; color: white; }
+    .btn-secondary { background: #edf2f7; color: #2d3748; }
+
+    /* Map */
+    #map { flex: 1; height: 100%; z-index: 1; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .app-container { flex-direction: column-reverse; }
+      .sidebar { width: 100%; height: 50vh; }
+      #map { height: 50vh; }
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-    body { display: flex; flex-direction: column; height: 100vh; overflow: hidden; background-color: var(--bg-body); color: var(--text-main); }
-    @media (min-width: 768px) { body { flex-direction: row; } }
-
-    #sidebar { width: 100%; height: 55vh; background: var(--surface); display: flex; flex-direction: column; z-index: 1000; border-right: 1px solid var(--border); box-shadow: var(--shadow-lg); }
-    @media (min-width: 768px) { #sidebar { width: 440px; height: 100%; } }
-
-    .header { padding: 18px 20px; background: #0b0f19; color: white; }
-    .header h1 { font-size: 1.15rem; font-weight: 800; }
-    .header-sub { font-size: 0.775rem; color: #94a3b8; margin-top: 4px; }
-    .meta-badges { display: flex; gap: 6px; margin-top: 10px; }
-    .meta-badge { background: rgba(255, 255, 255, 0.12); color: #cbd5e1; font-size: 0.675rem; font-weight: 600; padding: 3px 8px; border-radius: 9999px; }
-
-    .filter-panel { padding: 14px 20px; background: #f1f5f9; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
-    .filter-row { display: flex; gap: 8px; }
-    .filter-group { flex: 1; display: flex; flex-direction: column; gap: 4px; }
-    .filter-label { font-size: 0.675rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); }
-    select, input[type="range"] { width: 100%; padding: 7px 10px; font-size: 0.775rem; font-weight: 600; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text-main); outline: none; cursor: pointer; }
-    .range-val { font-size: 0.75rem; font-weight: 700; color: var(--primary); }
-
-    .location-list { flex: 1; overflow-y: auto; padding: 16px; background: var(--bg-body); }
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s ease; }
-    .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
-    .card.active { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2); }
-    .card-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
-    .card-title { font-size: 1rem; font-weight: 700; }
-    .rating-badge { background: #fef3c7; color: #92400e; font-size: 0.75rem; font-weight: 800; padding: 3px 8px; border-radius: 9999px; }
-
-    .tag-container { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
-    .dist-tag { font-size: 0.7rem; color: #166534; background: #dcfce7; font-weight: 700; padding: 2px 7px; border-radius: 6px; }
-    .price-tag { font-size: 0.7rem; color: #431407; background: #fee2e2; font-weight: 700; padding: 2px 7px; border-radius: 6px; }
-    .cuisine-tag { font-size: 0.7rem; color: var(--primary); background: #eff6ff; font-weight: 700; padding: 2px 7px; border-radius: 6px; text-transform: uppercase; }
-    .buffet-tag { font-size: 0.7rem; color: #7c2d12; background: #ffedd5; font-weight: 700; padding: 2px 7px; border-radius: 6px; }
-
-    .card-address { font-size: 0.775rem; color: var(--text-muted); margin-bottom: 8px; }
-    .foodie-highlight { font-size: 0.775rem; color: #065f46; background: #f0fdf4; border-left: 3px solid #16a34a; padding: 6px 10px; border-radius: 0 6px 6px 0; margin-bottom: 12px; }
-    .btn-group { display: flex; gap: 8px; }
-    .action-btn { flex: 1; text-align: center; padding: 8px 4px; font-size: 0.75rem; font-weight: 700; border-radius: 8px; text-decoration: none; display: flex; align-items: center; justify-content: center; }
-    .btn-nav { background: var(--primary); color: white; }
-    .btn-secondary { background: #f1f5f9; color: var(--text-main); border: 1px solid var(--border); }
-
-    #map { flex: 1; height: 45vh; }
-    @media (min-width: 768px) { #map { height: 100%; } }
-
-    .custom-pin { background-color: var(--primary); color: white; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 800; border: 2px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-    .home-pin { background-color: #ef4444; color: white; border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; border: 2.5px solid white; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4); }
   </style>
 </head>
 <body>
-  <div id="sidebar">
-    <div class="header">
-      <h1>Mom's 50th Birthday Map</h1>
-      <div class="header-sub">📍 Origin: 3255 S Dorsey Ln, Tempe</div>
-      <div class="meta-badges">
-        <span class="meta-badge">🚫 No Beef / Pork</span>
-        <span class="meta-badge">💰 Cap: $30/person</span>
-        <span class="meta-badge">❄️ Indoor A/C</span>
-      </div>
+
+  <header>
+    <div>
+      <h1>🎉 Mom's 50th Birthday Dinner Finder</h1>
+      <p>Calculated driving times from Dorsey Ln, Tempe</p>
     </div>
+  </header>
 
-    <div class="filter-panel">
-      <div class="filter-row">
-        <div class="filter-group">
-          <label class="filter-label">Max Price Limit (Category & Below)</label>
-          <select id="filter-price">
-            <option value="all">Any Price Level</option>
-            <option value="2" selected>$$ ($30/person & under)</option>
-            <option value="1">$ ($15/person & under)</option>
-          </select>
-        </div>
-        <div class="filter-group">
-          <label class="filter-label">Style</label>
-          <select id="filter-style">
-            <option value="all">All Styles</option>
-            <option value="buffet">Buffet / AYCE Only</option>
-            <option value="sitdown">Sit-Down / Family Style</option>
-          </select>
-        </div>
-      </div>
+  <div class="app-container">
+    <!-- Sidebar Controls & List -->
+    <div class="sidebar">
+      <div class="controls-panel">
+        <!-- Search Input -->
+        <input type="text" id="search-input" class="search-input" placeholder="🔍 Search name or dish (e.g., 'sushi', 'tacos')...">
 
-      <div class="filter-row" style="align-items: center; margin-top: 2px;">
-        <div class="filter-group">
-          <label class="filter-label">Max Radius: <span id="radius-val" class="range-val">30 mi</span></label>
-          <input type="range" id="filter-radius" min="2" max="30" value="30">
-        </div>
-        <div class="filter-group">
-          <label class="filter-label">Cuisine</label>
+        <!-- Filters Grid -->
+        <div class="filter-grid">
           <select id="filter-cuisine">
             <option value="all">All Cuisines</option>
             <option value="Indian">Indian</option>
-            <option value="Japanese">Japanese</option>
+            <option value="Sushi">Sushi</option>
             <option value="Thai">Thai</option>
-            <option value="Mexican">Mexican / Fusion</option>
+            <option value="Mexican">Mexican</option>
+            <option value="Asian-Mexican Fusion">Asian-Mexican Fusion</option>
+            <option value="Japanese / Teppanyaki">Teppanyaki</option>
+          </select>
+
+          <select id="filter-price">
+            <option value="all">All Prices</option>
+            <option value="1">$ (~$15-$18)</option>
+            <option value="2">$$ (~$18-$35)</option>
+            <option value="3">$$$ (~$40-$65)</option>
           </select>
         </div>
+
+        <!-- Sort By & Max Distance -->
+        <div class="filter-grid">
+          <select id="sort-by">
+            <option value="distAsc">Distance: Closest First</option>
+            <option value="ratingDesc">Rating: Highest First</option>
+            <option value="priceAsc">Price: Low to High</option>
+            <option value="priceDesc">Price: High to Low</option>
+          </select>
+
+          <div class="range-group">
+            <label>Max Dist: <b id="distance-val">30 mi</b></label>
+            <input type="range" id="filter-distance" min="1" max="30" value="30" step="1">
+          </div>
+        </div>
+
+        <!-- Buffet Toggle -->
+        <label class="checkbox-label">
+          <input type="checkbox" id="filter-buffet"> 🍣 Buffet / All-You-Can-Eat Only
+        </label>
       </div>
+
+      <!-- Restaurant Cards List -->
+      <div id="location-list" class="cards-list"></div>
     </div>
 
-    <div class="location-list" id="location-list"></div>
+    <!-- Leaflet Map Container -->
+    <div id="map"></div>
   </div>
 
-  <div id="map"></div>
-  <!-- Load Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-<!-- Load Data & Router Scripts -->
-<script src="js/restaurants.js"></script>
-<script src="js/router.js"></script>
-
-<!-- Main Application -->
-<script>
-  let locations = [];
-
-  async function initApp() {
-    const listContainer = document.getElementById('location-list');
-    if (listContainer) {
-      listContainer.innerHTML = `<div style="padding: 20px; text-align: center;">Calculating real driving routes...</div>`;
-    }
-
-    // Process raw restaurants using OSRM
-    locations = await processRestaurants(RESTAURANTS_RAW);
-
-    // Render filter controls, map pins, and restaurant cards
-    applyFilters();
-  }
-
-  window.addEventListener('DOMContentLoaded', initApp);
-</script>
-  <script type="module" src="./js/app.js"></script>
+  <!-- JS Dependencies -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/restaurants.js"></script>
+  <script src="js/router.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>

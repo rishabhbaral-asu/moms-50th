@@ -231,21 +231,6 @@ const RESTAURANTS_RAW = [
   },
   {
     id: 16,
-    name: "China Town Buffet",
-    cuisine: "Chinese",
-    isBuffet: true,
-    priceLevel: 1,
-    priceDisplay: "~$10–$15 pp ($)",
-    lat: 33.37824,
-    lng: -111.90393,
-    address: "1807 E Baseline Rd #102, Tempe, AZ 85283",
-    rating: "4.0 ★",
-    dishes: "AYCE Chinese staples, Sweet and Sour Chicken, Fried Rice, Sushi.",
-    menuUrl: "https://www.yelp.com/biz/china-town-buffet-tempe",
-    googleMapUrl: "https://maps.google.com/?q=China+Town+Buffet+Tempe"
-  },
-  {
-    id: 17,
     name: "Pacific Seafood Buffet",
     cuisine: "Chinese / Seafood",
     isBuffet: true,
@@ -260,7 +245,7 @@ const RESTAURANTS_RAW = [
     googleMapUrl: "https://maps.google.com/?q=Pacific+Seafood+Buffet+Chandler"
   },
   {
-    id: 18,
+    id: 17,
     name: "India Oven",
     cuisine: "Indian",
     isBuffet: true,

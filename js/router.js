@@ -77,7 +77,7 @@ async function processRestaurants(restaurants) {
       ...loc,
       distMiles: routeInfo.distMiles,
       driveTime: routeInfo.driveTime,
-      navUrl: `https://www.google.com/maps/dir/?api=1&origin=${ORIGIN_ADDRESS}&destination=${encodedAddr}`
+      navUrl: `https://www.google.com/maps/dir/?api=1&origin=${ORIGIN_ADDRESS}&destination=${encodedAddr}`,
       geometry: routeInfo.geometry
     };
   });

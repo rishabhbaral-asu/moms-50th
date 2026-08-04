@@ -1,6 +1,6 @@
 export class FilterEngine {
   constructor(dataset) {
-    this.dataset = dataset;[cite: 3]
+    this.dataset = dataset;
   }
 
   filterAndSort(criteria) {
@@ -17,17 +17,17 @@ export class FilterEngine {
       // 2. Price Filter
       if (criteria.maxPrice !== 'all') {
         const maxLevel = parseInt(criteria.maxPrice, 10);
-        if (loc.priceLevel > maxLevel) return false;[cite: 3]
+        if (loc.priceLevel > maxLevel) return false;
       }
 
       // 3. Buffet Filter
-      if (criteria.buffetOnly && !loc.isBuffet) return false;[cite: 3]
+      if (criteria.buffetOnly && !loc.isBuffet) return false;
 
       // 4. Cuisine Filter
-      if (criteria.cuisine !== 'all' && loc.cuisine !== criteria.cuisine) return false;[cite: 3]
+      if (criteria.cuisine !== 'all' && loc.cuisine !== criteria.cuisine) return false;
 
       // 5. Distance Radius Filter
-      if (loc.distMiles > criteria.maxRadius) return false;[cite: 3]
+      if (loc.distMiles > criteria.maxRadius) return false;
 
       return true;
     });

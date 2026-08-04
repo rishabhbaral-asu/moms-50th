@@ -2,6 +2,7 @@ export class DiningMap {
   constructor(mapContainerId, centerLat, centerLng) {
     this.map = L.map(mapContainerId).setView([centerLat, centerLng], 10);
     this.markers = [];
+    this.activeRoute = null; // NEW: Keeps track of the blue line
     this.initTileLayer();
     this.addHomeMarker(centerLat, centerLng);
   }
@@ -56,7 +57,27 @@ updateMarkers(dataset, onMarkerClickCallback) {
       this.markers.push(marker);
     });
   }
+// NEW METHOD: Draws the blue Google Maps-style route
+  drawRoute(geometry) {
+    // 1. Remove the old route if one exists
+    if (this.activeRoute) {
+      this.map.removeLayer(this.activeRoute);
+    }
 
+    if (!geometry) return; // Fallback if OSRM failed
+
+    // 2. Draw the new route using Leaflet's geoJSON feature
+    this.activeRoute = L.geoJSON(geometry, {
+      style: {
+        color: '#2563eb', // A nice Google Maps Blue
+        weight: 6,        // Thick line
+        opacity: 0.8
+      }
+    }).addTo(this.map);
+
+    // 3. Zoom the map so the whole route fits on the screen perfectly
+    this.map.fitBounds(this.activeRoute.getBounds(), { padding: [50, 50] });
+  }
   focusLocation(lat, lng) {
     this.map.flyTo([lat, lng], 13, { duration: 1.2 });
   }

@@ -78,6 +78,7 @@ async function processRestaurants(restaurants) {
       distMiles: routeInfo.distMiles,
       driveTime: routeInfo.driveTime,
       navUrl: `https://www.google.com/maps/dir/?api=1&origin=${ORIGIN_ADDRESS}&destination=${encodedAddr}`
+      geometry: routeInfo.geometry
     };
   });
 }

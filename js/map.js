@@ -24,34 +24,36 @@ export class DiningMap {
       .bindPopup(`<b>🏠 Start Point: 3255 S Dorsey Ln</b>`);
   }
 
-  updateMarkers(dataset, onCardClickCallback) {
-    this.markers.forEach(m => this.map.removeLayer(m));
-    this.markers = [];
+updateMarkers(dataset, onMarkerClickCallback) {
+    this.markers.forEach(m => this.map.removeLayer(m));[cite: 4]
+    this.markers = [];[cite: 4]
 
     dataset.forEach((loc, idx) => {
       const pinIcon = L.divIcon({
-        className: 'custom-pin',
-        html: `<span>${idx + 1}</span>`,
-        iconSize: [30, 30],
-        iconAnchor: [15, 30]
+        className: 'custom-pin',[cite: 4]
+        html: `<span>${idx + 1}</span>`,[cite: 4]
+        iconSize: [30, 30],[cite: 4]
+        iconAnchor: [15, 30][cite: 4]
       });
 
-      const marker = L.marker([loc.lat, loc.lng], { icon: pinIcon }).addTo(this.map);
+      const marker = L.marker([loc.lat, loc.lng], { icon: pinIcon }).addTo(this.map);[cite: 4]
 
+      // Your existing popupHTML goes here...
       const popupHTML = `
         <div style="font-family: sans-serif; width: 220px;">
           <h3 style="margin-bottom: 2px; color: #0f172a; font-size: 0.95rem;">${loc.name}</h3>
-          <p style="font-size: 0.75rem; color: #166534; font-weight: bold;">🚘 ${loc.distMiles} mi (${loc.driveTime})</p>
-          <p style="font-size: 0.75rem; color: #b45309; font-weight: bold;">${loc.rating} • ${loc.priceDisplay}</p>
-          <p style="font-size: 0.75rem; color: #065f46; margin: 4px 0;"><b>Highlights:</b> ${loc.dishes}</p>
-          <div style="margin-top: 8px; display: flex; gap: 4px;">
-            <a href="${loc.navUrl}" target="_blank" style="background: #2563eb; color: white; padding: 4px 8px; font-size: 0.7rem; border-radius: 4px; text-decoration: none; font-weight: bold;">🚗 Route</a>
-            <a href="${loc.menuUrl}" target="_blank" style="background: #f1f5f9; color: #0f172a; padding: 4px 8px; font-size: 0.7rem; border-radius: 4px; text-decoration: none; font-weight: bold;">📖 Menu</a>
-          </div>
+          <p style="font-size: 0.75rem; color: #166534; font-weight: bold;">🚗 ${loc.distMiles} mi (${loc.driveTime})</p>
+          <a href="${loc.navUrl}" target="_blank" style="background: #2563eb; color: white; padding: 4px 8px; font-size: 0.7rem; border-radius: 4px; text-decoration: none; font-weight: bold;">Route</a>
         </div>
       `;
-      marker.bindPopup(popupHTML);
-      this.markers.push(marker);
+      marker.bindPopup(popupHTML);[cite: 4]
+      
+      // NEW: Trigger callback on click
+      marker.on('click', () => {
+        if (onMarkerClickCallback) onMarkerClickCallback(loc.id);
+      });
+
+      this.markers.push(marker);[cite: 4]
     });
   }
 

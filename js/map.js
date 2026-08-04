@@ -34,7 +34,7 @@ updateMarkers(dataset, onMarkerClickCallback) {
         className: 'custom-pin',
         html: `<span>${idx + 1}</span>`,
         iconSize: [30, 30],
-        iconAnchor: [15, 30]
+        iconAnchor: [15,15]
       });
 
       const marker = L.marker([loc.lat, loc.lng], { icon: pinIcon }).addTo(this.map);

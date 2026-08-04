@@ -31,8 +31,8 @@ function computeGridFallback(lat1, lon1, lat2, lon2) {
  * @returns {Promise<{distMiles: number, driveTime: string}>}
  */
 async function fetchRouteDetails(destLat, destLng) {
-  // OSRM format requires: longitude,latitude
-  const url = `https://router.project-osrm.org/route/v1/driving/${ORIGIN_LNG},${ORIGIN_LAT};${destLng},${destLat}?overview=false`;
+  // NEW: Changed overview=false to overview=full and requested geojson geometries
+  const url = `https://router.project-osrm.org/route/v1/driving/${ORIGIN_LNG},${ORIGIN_LAT};${destLng},${destLat}?overview=full&geometries=geojson`;
 
   try {
     const response = await fetch(url);
@@ -42,22 +42,19 @@ async function fetchRouteDetails(destLat, destLng) {
 
     if (data.code === 'Ok' && data.routes.length > 0) {
       const route = data.routes[0];
-      
-      // Convert meters to miles (1 meter = 0.000621371 miles)
       const miles = (route.distance * 0.000621371).toFixed(1);
-      
-      // Convert seconds to minutes
       const mins = Math.round(route.duration / 60);
 
       return {
         distMiles: parseFloat(miles),
-        driveTime: `~${mins} mins`
+        driveTime: `~${mins} mins`,
+        geometry: route.geometry // NEW: We are saving the actual route shape!
       };
     } else {
       throw new Error('OSRM returned no routes');
     }
   } catch (error) {
-    console.warn(`OSRM fetch failed for (${destLat}, ${destLng}). Falling back to grid distance:`, error);
+    console.warn(`OSRM fetch failed for (${destLat}, ${destLng}).`, error);
     return computeGridFallback(ORIGIN_LAT, ORIGIN_LNG, destLat, destLng);
   }
 }

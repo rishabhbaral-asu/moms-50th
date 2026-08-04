@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const listContainer = document.getElementById('location-list');
   listContainer.innerHTML = `<div style="padding: 20px; text-align: center;">Calculating real driving routes...</div>`;
   
-  // processRestaurants uses OSRM to get real distances using RESTAURANTS_RAW[cite: 5]
+  // processRestaurants uses OSRM to calculate real road distances from RESTAURANTS_RAW
   const restaurants = await processRestaurants(RESTAURANTS_RAW); 
 
   const mapInstance = new DiningMap('map', START_LAT, START_LNG);
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const radiusInput = document.getElementById('filter-distance');
   const radiusVal = document.getElementById('distance-val');
 
-  // Highlight a card when a map pin is clicked
+  // Highlight a card when a map pin or card is clicked
   function highlightCard(id) {
     document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
     const targetCard = document.getElementById(`card-${id}`);
@@ -45,17 +45,48 @@ document.addEventListener('DOMContentLoaded', async () => {
       const card = document.createElement('div');
       card.className = 'card';
       card.id = `card-${loc.id}`;
-      // Use your existing card HTML structure here...
+
       card.innerHTML = `
-        <div class="card-title">${idx + 1}. ${loc.name}</div>
-        <div class="tag-container">
-          <span>🚘 ${loc.distMiles} mi (${loc.driveTime})</span>
-          <span>💰 ${loc.priceDisplay}</span>
+        <div class="card-header-row" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+          <div class="card-title" style="font-weight: 700; font-size: 1rem; color: #2d3748;">${idx + 1}. ${loc.name}</div>
+          <div class="rating-badge" style="background: #edf2f7; padding: 2px 6px; border-radius: 4px; font-weight: 600; font-size: 0.8rem;">${loc.rating}</div>
+        </div>
+
+        <div class="tag-container" style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;">
+          <span class="price-tag" style="background: #e2e8f0; color: #4a5568; font-size: 0.75rem; padding: 2px 8px; border-radius: 12px;">💰 ${loc.priceDisplay}</span>
+          <span class="cuisine-tag" style="background: #e2e8f0; color: #4a5568; font-size: 0.75rem; padding: 2px 8px; border-radius: 12px;">${loc.cuisine}</span>
+          ${loc.isBuffet ? '<span class="buffet-tag" style="background: #feebc8; color: #742a2a; font-weight: 600; font-size: 0.75rem; padding: 2px 8px; border-radius: 12px;">🍱 AYCE / Buffet</span>' : ''}
+        </div>
+
+        <!-- Google Maps Style Prominent Directions Banner -->
+        <div style="margin: 10px 0; padding: 10px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-weight: bold; color: #1e293b; font-size: 0.95rem;">🚘 ${loc.distMiles} mi</div>
+            <div style="font-size: 0.8rem; color: #64748b;">${loc.driveTime} drive</div>
+          </div>
+          <a href="${loc.navUrl}" target="_blank" onclick="event.stopPropagation();" style="background: #2563eb; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 0.85rem; display: flex; gap: 6px; align-items: center;">
+            <span style="font-size: 1.1rem; line-height: 1;">↱</span> Directions
+          </a>
+        </div>
+
+        <div class="card-address" style="font-size: 0.85rem; color: #4a5568; margin-bottom: 6px;">📍 ${loc.address}</div>
+        <div class="foodie-highlight" style="font-size: 0.85rem; color: #4a5568; margin-bottom: 10px;">🍗 <b>Highlights:</b> ${loc.dishes}</div>
+
+        <div class="btn-group" style="display: flex; gap: 8px;">
+          <a href="${loc.menuUrl}" target="_blank" class="action-btn btn-secondary" onclick="event.stopPropagation();" style="flex: 1; text-align: center; background: #edf2f7; color: #2d3748; padding: 6px; border-radius: 4px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">📖 Menu</a>
+          <a href="${loc.googleMapUrl}" target="_blank" class="action-btn btn-secondary" onclick="event.stopPropagation();" style="flex: 1; text-align: center; background: #edf2f7; color: #2d3748; padding: 6px; border-radius: 4px; text-decoration: none; font-size: 0.8rem; font-weight: 600;">⭐ Reviews</a>
         </div>
       `;
 
       card.addEventListener('click', () => {
-        mapInstance.focusLocation(loc.lat, loc.lng);
+        // NEW: Draw the route line!
+        if (loc.geometry) {
+          mapInstance.drawRoute(loc.geometry);
+        } else {
+          // If fallback was used and no route exists, just focus the pin
+          mapInstance.focusLocation(loc.lat, loc.lng);
+        }
+        
         highlightCard(loc.id);
       });
 
@@ -75,12 +106,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     radiusVal.innerText = `${criteria.maxRadius} mi`;
     
-    // Use the new filterAndSort method
+    // Filter and sort dataset
     const filteredData = filterInstance.filterAndSort(criteria);
     
     renderList(filteredData);
     
-    // Pass the highlightCard callback so clicking pins updates the UI
+    // Pass callback to highlight card when map markers are clicked
     mapInstance.updateMarkers(filteredData, highlightCard);
   }
 

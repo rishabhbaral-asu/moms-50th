@@ -119,28 +119,32 @@
   </div>
 
   <div id="map"></div>
-<!-- Load router.js script -->
-<script src="./js/router.js"></script>
+  <!-- Load Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+<!-- Load Data & Router Scripts -->
+<script src="js/restaurants.js"></script>
+<script src="js/router.js"></script>
+
+<!-- Main Application -->
 <script>
   let locations = [];
 
-  // Initialize data asynchronously on page load
   async function initApp() {
-    // Show a quick loading state if needed
-    document.getElementById('location-list').innerHTML = `<div style="padding: 20px; text-align: center;">Calculating real driving routes...</div>`;
+    const listContainer = document.getElementById('location-list');
+    if (listContainer) {
+      listContainer.innerHTML = `<div style="padding: 20px; text-align: center;">Calculating real driving routes...</div>`;
+    }
 
-    // Process raw restaurants through OSRM
+    // Process raw restaurants using OSRM
     locations = await processRestaurants(RESTAURANTS_RAW);
 
-    // Initial render of filters, cards, and map pins
+    // Render filter controls, map pins, and restaurant cards
     applyFilters();
   }
 
-  // Run app startup
   window.addEventListener('DOMContentLoaded', initApp);
 </script>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script type="module" src="./js/app.js"></script>
 </body>
 </html>

@@ -1,27 +1,50 @@
 export class FilterEngine {
   constructor(dataset) {
-    this.dataset = dataset;
+    this.dataset = dataset;[cite: 3]
   }
 
-  filter(criteria) {
-    return this.dataset.filter(loc => {
-      // 1. "Category & Below" Price Filter
-      if (criteria.maxPrice !== 'all') {
-        const maxLevel = parseInt(criteria.maxPrice, 10);
-        if (loc.priceLevel > maxLevel) return false;
+  filterAndSort(criteria) {
+    let filtered = this.dataset.filter(loc => {
+      // 1. Text Search Filter (Matches name, cuisine, or dishes)
+      if (criteria.searchQuery) {
+        const query = criteria.searchQuery.toLowerCase();
+        const matchesSearch = loc.name.toLowerCase().includes(query) || 
+                              loc.cuisine.toLowerCase().includes(query) || 
+                              loc.dishes.toLowerCase().includes(query);
+        if (!matchesSearch) return false;
       }
 
-      // 2. Style Filter
-      if (criteria.style === 'buffet' && !loc.isBuffet) return false;
-      if (criteria.style === 'sitdown' && loc.isBuffet) return false;
+      // 2. Price Filter
+      if (criteria.maxPrice !== 'all') {
+        const maxLevel = parseInt(criteria.maxPrice, 10);
+        if (loc.priceLevel > maxLevel) return false;[cite: 3]
+      }
 
-      // 3. Cuisine Filter
-      if (criteria.cuisine !== 'all' && loc.cuisine !== criteria.cuisine) return false;
+      // 3. Buffet Filter
+      if (criteria.buffetOnly && !loc.isBuffet) return false;[cite: 3]
 
-      // 4. Distance Radius Filter (Category & Below)
-      if (loc.distMiles > criteria.maxRadius) return false;
+      // 4. Cuisine Filter
+      if (criteria.cuisine !== 'all' && loc.cuisine !== criteria.cuisine) return false;[cite: 3]
+
+      // 5. Distance Radius Filter
+      if (loc.distMiles > criteria.maxRadius) return false;[cite: 3]
 
       return true;
     });
+
+    // 6. Sorting Logic
+    filtered.sort((a, b) => {
+      if (criteria.sortBy === 'distAsc') return a.distMiles - b.distMiles;
+      if (criteria.sortBy === 'priceAsc') return a.priceLevel - b.priceLevel;
+      if (criteria.sortBy === 'priceDesc') return b.priceLevel - a.priceLevel;
+      if (criteria.sortBy === 'ratingDesc') {
+        const rA = parseFloat(a.rating) || 0;
+        const rB = parseFloat(b.rating) || 0;
+        return rB - rA;
+      }
+      return 0;
+    });
+
+    return filtered;
   }
 }

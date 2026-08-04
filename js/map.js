@@ -25,18 +25,18 @@ export class DiningMap {
   }
 
 updateMarkers(dataset, onMarkerClickCallback) {
-    this.markers.forEach(m => this.map.removeLayer(m));[cite: 4]
-    this.markers = [];[cite: 4]
+    this.markers.forEach(m => this.map.removeLayer(m));
+    this.markers = [];
 
     dataset.forEach((loc, idx) => {
       const pinIcon = L.divIcon({
-        className: 'custom-pin',[cite: 4]
-        html: `<span>${idx + 1}</span>`,[cite: 4]
-        iconSize: [30, 30],[cite: 4]
-        iconAnchor: [15, 30][cite: 4]
+        className: 'custom-pin',
+        html: `<span>${idx + 1}</span>`,
+        iconSize: [30, 30],
+        iconAnchor: [15, 30]
       });
 
-      const marker = L.marker([loc.lat, loc.lng], { icon: pinIcon }).addTo(this.map);[cite: 4]
+      const marker = L.marker([loc.lat, loc.lng], { icon: pinIcon }).addTo(this.map);
 
       // Your existing popupHTML goes here...
       const popupHTML = `
@@ -46,14 +46,14 @@ updateMarkers(dataset, onMarkerClickCallback) {
           <a href="${loc.navUrl}" target="_blank" style="background: #2563eb; color: white; padding: 4px 8px; font-size: 0.7rem; border-radius: 4px; text-decoration: none; font-weight: bold;">Route</a>
         </div>
       `;
-      marker.bindPopup(popupHTML);[cite: 4]
+      marker.bindPopup(popupHTML);
       
       // NEW: Trigger callback on click
       marker.on('click', () => {
         if (onMarkerClickCallback) onMarkerClickCallback(loc.id);
       });
 
-      this.markers.push(marker);[cite: 4]
+      this.markers.push(marker);
     });
   }
 

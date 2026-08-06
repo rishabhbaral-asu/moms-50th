@@ -3,7 +3,7 @@
  * Raw restaurant dataset for Mom's 50th Birthday celebration.
  */
 
-const RESTAURANTS_RAW = [
+export const RESTAURANTS_RAW = [
   {
     id: 1,
     name: "Bombay House – Tempe",
@@ -28,7 +28,7 @@ const RESTAURANTS_RAW = [
     priceDisplay: "~$25–$35 pp ($$)",
     lat: 33.3201,
     lng: -111.8622,
-    address: "2040 Alma School Rd, Chandler, AZ 85286",
+    address: "1175 W Ray Rd #1, Chandler, AZ 85224",
     rating: "4.5 ★",
     dishes: "All-You-Can-Eat sushi, sashimi, specialty rolls, gyoza, chicken teriyaki.",
     menuUrl: "https://yamasushihouse.com/",
@@ -46,7 +46,7 @@ const RESTAURANTS_RAW = [
     address: "7131 E Main St, Scottsdale, AZ 85251",
     rating: "4.4 ★",
     dishes: "Evil Jungle Curry, Tom Yum Soup, Pad Thai, Pineapple Fried Rice.",
-    menuUrl: "https://maleesthaibistro.com/",
+    menuUrl: "https://maleesonmain.com/",
     googleMapUrl: "https://maps.google.com/?q=Malees+Thai+Bistro+Scottsdale"
   },
   {
@@ -80,21 +80,6 @@ const RESTAURANTS_RAW = [
     googleMapUrl: "https://maps.google.com/?q=Bombay+House+Scottsdale"
   },
   {
-    id: 6,
-    name: "Tandoori Times 3 – Scottsdale",
-    cuisine: "Indian",
-    isBuffet: true,
-    priceLevel: 2,
-    priceDisplay: "~$18–$22 pp ($$)",
-    lat: 33.5552,
-    lng: -111.9095,
-    address: "8140 E Cactus Rd, Scottsdale, AZ 85260",
-    rating: "4.3 ★",
-    dishes: "Lunch Buffet, Goat Curry, Chicken Vindaloo, Garlic Naan.",
-    menuUrl: "http://tandooritimes.com/",
-    googleMapUrl: "https://maps.google.com/?q=Tandoori+Times+Scottsdale"
-  },
-  {
     id: 7,
     name: "Yama Sushi House – Central Phoenix",
     cuisine: "Sushi",
@@ -118,7 +103,7 @@ const RESTAURANTS_RAW = [
     priceDisplay: "~$25–$35 pp ($$)",
     lat: 33.5675,
     lng: -111.9168,
-    address: "8688 E Raintree Dr, Scottsdale, AZ 85260",
+    address: "7704 E Doubletree Ranch Rd #150, Scottsdale, AZ 85258",
     rating: "4.6 ★",
     dishes: "All-You-Can-Eat sushi, nigiri, dragon rolls, gyoza.",
     menuUrl: "https://yamasushihouse.com/",
@@ -133,7 +118,7 @@ const RESTAURANTS_RAW = [
     priceDisplay: "~$35–$50 pp ($$$)",
     lat: 33.5990,
     lng: -111.9790,
-    address: "4801 E Cactus Rd, Phoenix, AZ 85032",
+    address: "4801 E Cactus Rd, Phoenix, AZ 85254",
     rating: "4.4 ★",
     dishes: "3-Foot Piñata Guacamole, Birria Tacos, Sizzling Fajitas, Churro Cart.",
     menuUrl: "https://themexicano.com/",

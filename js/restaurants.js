@@ -198,5 +198,50 @@ export const RESTAURANTS_RAW = [
     dishes: "All-You-Can-Eat sushi, sashimi, specialty rolls.",
     menuUrl: "https://yamasushihouse.com/",
     googleMapUrl: "https://maps.google.com/?q=Yama+Sushi+House+Peoria"
+  },
+  {
+    id: 15,
+    name: "Hibachi Super Buffet",
+    cuisine: "Chinese / Japanese",
+    isBuffet: true,
+    priceLevel: 2,
+    priceDisplay: "~$15–$25 pp ($$)",
+    lat: 33.39308,
+    lng: -111.85698,
+    address: "1164 W Southern Ave, Mesa, AZ 85210",
+    rating: "4.1 ★",
+    dishes: "Mongolian Grill, Sushi Station, Snow Crab Legs, Dessert Bar.",
+    menuUrl: "http://hibachigrillmesa.com/",
+    googleMapUrl: "https://maps.google.com/?q=Hibachi+Super+Buffet+Mesa"
+  },
+  {
+    id: 16,
+    name: "Pacific Seafood Buffet",
+    cuisine: "Chinese / Seafood",
+    isBuffet: true,
+    priceLevel: 2,
+    priceDisplay: "~$20–$30 pp ($$)",
+    lat: 33.34992,
+    lng: -111.84158,
+    address: "3110 N Arizona Ave, Chandler, AZ 85225",
+    rating: "4.2 ★",
+    dishes: "Snow Crab Legs, Large Seafood Selection, Dim Sum, Sushi.",
+    menuUrl: "https://pacificseafoodbuffet.com/",
+    googleMapUrl: "https://maps.google.com/?q=Pacific+Seafood+Buffet+Chandler"
+  },
+  {
+    id: 17,
+    name: "India Oven",
+    cuisine: "Indian",
+    isBuffet: true,
+    priceLevel: 2,
+    priceDisplay: "~$18–$23 pp ($$)",
+    lat: 33.3871, 
+    lng: -111.7882,
+    address: "1315 S Gilbert Rd #5204, Mesa, AZ 85204",
+    rating: "4.4 ★",
+    dishes: "Daily Buffet, Paneer Tikka Masala, Tandoori Chicken, Fresh Naan.",
+    menuUrl: "https://azindiaoven.com/",
+    googleMapUrl: "https://maps.google.com/?q=India+Oven+Mesa"
   }
 ];

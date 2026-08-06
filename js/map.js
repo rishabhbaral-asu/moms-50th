@@ -2,6 +2,7 @@ export class DiningMap {
   constructor(mapContainerId, centerLat, centerLng) {
     this.map = L.map(mapContainerId).setView([centerLat, centerLng], 10);
     this.markers = [];
+    this.activeRoute = null; // NEW: Keeps track of the blue line
     this.initTileLayer();
     this.addHomeMarker(centerLat, centerLng);
   }
@@ -24,7 +25,7 @@ export class DiningMap {
       .bindPopup(`<b>🏠 Start Point: 3255 S Dorsey Ln</b>`);
   }
 
-  updateMarkers(dataset, onCardClickCallback) {
+updateMarkers(dataset, onMarkerClickCallback) {
     this.markers.forEach(m => this.map.removeLayer(m));
     this.markers = [];
 
@@ -33,28 +34,50 @@ export class DiningMap {
         className: 'custom-pin',
         html: `<span>${idx + 1}</span>`,
         iconSize: [30, 30],
-        iconAnchor: [15, 30]
+        iconAnchor: [15,15]
       });
 
       const marker = L.marker([loc.lat, loc.lng], { icon: pinIcon }).addTo(this.map);
 
+      // Your existing popupHTML goes here...
       const popupHTML = `
         <div style="font-family: sans-serif; width: 220px;">
           <h3 style="margin-bottom: 2px; color: #0f172a; font-size: 0.95rem;">${loc.name}</h3>
-          <p style="font-size: 0.75rem; color: #166534; font-weight: bold;">🚘 ${loc.distMiles} mi (${loc.driveTime})</p>
-          <p style="font-size: 0.75rem; color: #b45309; font-weight: bold;">${loc.rating} • ${loc.priceDisplay}</p>
-          <p style="font-size: 0.75rem; color: #065f46; margin: 4px 0;"><b>Highlights:</b> ${loc.dishes}</p>
-          <div style="margin-top: 8px; display: flex; gap: 4px;">
-            <a href="${loc.navUrl}" target="_blank" style="background: #2563eb; color: white; padding: 4px 8px; font-size: 0.7rem; border-radius: 4px; text-decoration: none; font-weight: bold;">🚗 Route</a>
-            <a href="${loc.menuUrl}" target="_blank" style="background: #f1f5f9; color: #0f172a; padding: 4px 8px; font-size: 0.7rem; border-radius: 4px; text-decoration: none; font-weight: bold;">📖 Menu</a>
-          </div>
+          <p style="font-size: 0.75rem; color: #166534; font-weight: bold;">🚗 ${loc.distMiles} mi (${loc.driveTime})</p>
+          <a href="${loc.navUrl}" target="_blank" style="background: #2563eb; color: white; padding: 4px 8px; font-size: 0.7rem; border-radius: 4px; text-decoration: none; font-weight: bold;">Route</a>
         </div>
       `;
       marker.bindPopup(popupHTML);
+      
+      // NEW: Trigger callback on click
+      marker.on('click', () => {
+        if (onMarkerClickCallback) onMarkerClickCallback(loc.id);
+      });
+
       this.markers.push(marker);
     });
   }
+// NEW METHOD: Draws the blue Google Maps-style route
+  drawRoute(geometry) {
+    // 1. Remove the old route if one exists
+    if (this.activeRoute) {
+      this.map.removeLayer(this.activeRoute);
+    }
 
+    if (!geometry) return; // Fallback if OSRM failed
+
+    // 2. Draw the new route using Leaflet's geoJSON feature
+    this.activeRoute = L.geoJSON(geometry, {
+      style: {
+        color: '#2563eb', // A nice Google Maps Blue
+        weight: 6,        // Thick line
+        opacity: 0.8
+      }
+    }).addTo(this.map);
+
+    // 3. Zoom the map so the whole route fits on the screen perfectly
+    this.map.fitBounds(this.activeRoute.getBounds(), { padding: [50, 50] });
+  }
   focusLocation(lat, lng) {
     this.map.flyTo([lat, lng], 13, { duration: 1.2 });
   }
